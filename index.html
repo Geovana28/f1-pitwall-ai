@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>F1 Pit-Wall Telemetry & Strategy AI — Mexico GP (Kimi Antonelli #12)</title>
+  <title>F1 Global Pit-Wall Telemetry & Strategy AI — 24 Circuits & 10 Teams</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070b14;
+      --bg: #060913;
       --card: #0f172a;
-      --border: rgba(45, 212, 191, 0.22);
-      --teal: #00d2be;
+      --border: rgba(45, 212, 191, 0.25);
+      --accent: #00d2be;
       --red: #ef4444;
       --yellow: #facc15;
       --white: #f8fafc;
@@ -20,76 +20,118 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top right, #0d2538 0%, var(--bg) 55%);
+      background: radial-gradient(circle at top right, #0d2538 0%, var(--bg) 60%);
       color: var(--white);
       min-height: 100vh;
-      padding: 24px;
+      padding: 20px 24px 40px;
     }
-    .container { max-width: 1280px; margin: 0 auto; }
+    .container { max-width: 1380px; margin: 0 auto; }
     header {
-      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-      gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start;
+      gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
     }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
     .badge {
-      display: inline-block; background: rgba(0, 210, 190, 0.14); color: var(--teal);
-      border: 1px solid var(--teal); font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(0, 210, 190, 0.14); color: var(--accent);
+      border: 1px solid var(--accent); font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;
     }
+    .badge-next {
+      background: rgba(250, 204, 21, 0.14); color: var(--yellow); border-color: var(--yellow);
+      cursor: pointer; transition: transform 0.15s ease;
+    }
+    .badge-next:hover { transform: translateY(-1px); }
     h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
-    h1 span { color: var(--teal); }
-    .subtitle { color: var(--muted); font-size: 0.92rem; margin-top: 4px; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; max-width: 880px; }
+
+    .weather-pill {
+      background: rgba(15, 23, 42, 0.92); border: 1px solid var(--border);
+      padding: 10px 14px; border-radius: 10px; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; color: var(--white); min-width: 260px;
+    }
+    .weather-pill strong { color: var(--accent); display: block; margin-bottom: 3px; }
+
     .kpi-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px; margin-bottom: 24px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 14px; margin-bottom: 20px;
     }
     .kpi-card {
-      background: rgba(15, 23, 42, 0.88); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px 18px;
-    }
-    .kpi-label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .kpi-val {
-      font-family: 'JetBrains Mono', monospace; font-size: 1.55rem; font-weight: 700;
-      color: var(--teal); margin-top: 6px;
-    }
-    .kpi-sub { color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
-    .main-grid {
-      display: grid; grid-template-columns: 340px 1fr; gap: 20px;
-    }
-    @media (max-width: 960px) { .main-grid { grid-template-columns: 1fr; } }
-    .panel {
       background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px;
+      border-radius: 12px; padding: 14px 16px;
     }
-    .panel h2 { font-size: 1.05rem; margin-bottom: 14px; color: var(--teal); font-weight: 700; }
-    .control-group { margin-bottom: 16px; }
+    .kpi-label { color: var(--muted); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .kpi-val {
+      font-family: 'JetBrains Mono', monospace; font-size: 1.42rem; font-weight: 700;
+      color: var(--accent); margin-top: 5px;
+    }
+    .kpi-sub { color: var(--muted); font-size: 0.76rem; margin-top: 4px; }
+
+    .main-grid {
+      display: grid; grid-template-columns: 380px 1fr; gap: 20px;
+    }
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.92); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+    }
+    .panel h2 {
+      font-size: 0.98rem; margin-bottom: 14px; color: var(--accent);
+      font-weight: 700; display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-divider {
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+      margin: 14px 0; padding-top: 12px;
+    }
+    .control-group { margin-bottom: 13px; }
     .control-group label {
-      display: flex; justify-content: space-between; font-size: 0.85rem;
-      color: var(--white); margin-bottom: 6px; font-weight: 600;
+      display: flex; justify-content: space-between; font-size: 0.81rem;
+      color: var(--white); margin-bottom: 5px; font-weight: 600;
+    }
+    .control-group label span.val-tag {
+      font-family: 'JetBrains Mono', monospace; color: var(--accent);
     }
     select, input[type="range"] {
       width: 100%; background: #1e293b; color: var(--white);
-      border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; padding: 8px 10px;
-      font-family: inherit;
+      border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; padding: 7px 10px;
+      font-family: inherit; font-size: 0.84rem;
     }
+    .specs-box {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 9px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.77rem;
+    }
+    .specs-item span { color: var(--muted); display: block; font-size: 0.7rem; }
+    .specs-item strong { font-family: 'JetBrains Mono', monospace; color: var(--white); }
+
     .radio-box {
-      margin-top: 18px; padding: 14px; background: rgba(0, 210, 190, 0.07);
-      border-left: 3px solid var(--teal); border-radius: 8px; font-size: 0.85rem; line-height: 1.5;
+      margin-top: 14px; padding: 12px 14px; background: rgba(0, 210, 190, 0.08);
+      border-left: 3px solid var(--accent); border-radius: 8px; font-size: 0.82rem; line-height: 1.48;
     }
     .radio-title {
-      font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--teal);
-      margin-bottom: 6px; font-size: 0.78rem;
+      font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent);
+      margin-bottom: 5px; font-size: 0.75rem;
     }
-    .charts-col { display: flex; flex-direction: column; gap: 20px; }
-    .chart-wrap { position: relative; height: 280px; width: 100%; }
+    .charts-col { display: flex; flex-direction: column; gap: 18px; }
+    .chart-wrap { position: relative; height: 265px; width: 100%; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div>
-        <span class="badge">MERCEDES-AMG PETRONAS • #12 KIMI ANTONELLI • MEXICO CITY GP (2,240m)</span>
-        <h1>🏎️ F1 Pit-Wall <span>Telemetry & Strategy AI</span></h1>
-        <p class="subtitle">Simulador de Degradação Não-Linear de Pneus (Soft/Medium/Hard), Física Barométrica em Altitude e Janela Ótima de Undercut (71 Voltas)</p>
+        <div class="badge-row">
+          <span class="badge" id="headerBadge">🌍 CALENDÁRIO MUNDIAL F1 (24 CIRCUITOS • 10 EQUIPES)</span>
+          <span class="badge badge-next" id="nextGpBadge" title="Clique para carregar a próxima corrida do calendário">⏭️ PRÓXIMO GP: CARREGANDO...</span>
+        </div>
+        <h1>🏎️ F1 Global Pit-Wall <span>Telemetry, Car Setup & Strategy AI</span></h1>
+        <p class="subtitle">Plataforma interativa para todos os 24 autódromos do mundo e todas as 10 equipes do grid: ajuste Asa (Downforce), Altura do Assoalho (Ground Effect), Modo ERS e estratégia de Pit Stop com física barométrica e clima ao vivo via Open-Meteo.</p>
+      </div>
+      <div class="weather-pill" id="liveWeatherBox">
+        <strong>🛰️ TELEMETRIA METEOROLÓGICA (OPEN-METEO)</strong>
+        <span id="weatherStatus">Sincronizando coordenadas do autódromo...</span>
       </div>
     </header>
 
@@ -100,67 +142,133 @@
         <div class="kpi-sub" id="kpiWindowSub">Janela recomendada: Voltas 26–30</div>
       </div>
       <div class="kpi-card">
+        <div class="kpi-label">Velocidade Máx. Reta (c/ DRS)</div>
+        <div class="kpi-val" id="kpiTopSpeed">354.2 km/h</div>
+        <div class="kpi-sub" id="kpiCornerSpeed">Apex Curva Média: 204.5 km/h</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Efeito Altitude & Densidade ISA</div>
+        <div class="kpi-val" id="kpiAero">-8.5%</div>
+        <div class="kpi-sub" id="kpiDensity">Densidade do ar: 1.121 kg/m³</div>
+      </div>
+      <div class="kpi-card">
         <div class="kpi-label">Ganho de Undercut (1 Volta)</div>
         <div class="kpi-val" id="kpiUndercut">+1.42 s</div>
-        <div class="kpi-sub">Pneu novo vs. composto desgastado no cliff</div>
+        <div class="kpi-sub" id="kpiPirelliSub">Alocação Pirelli: C3 • C4 • C5</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Redução Aerodinâmica (2.240m)</div>
-        <div class="kpi-val" id="kpiAero">-23.8%</div>
-        <div class="kpi-sub" id="kpiDensity">Densidade do ar: 0.933 kg/m³ (ISA)</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Delta Estratégia Escolhida vs Ótima</div>
-        <div class="kpi-val" id="kpiDelta">+0.00 s</div>
-        <div class="kpi-sub" id="kpiTotalTime">Tempo total estimado de prova</div>
+        <div class="kpi-label">Probabilidade Safety Car (Hist.)</div>
+        <div class="kpi-val" id="kpiSafetyCar">79%</div>
+        <div class="kpi-sub" id="kpiPitLossSub">Pit Lane Time Loss: 19.8 s</div>
       </div>
     </div>
 
     <div class="main-grid">
       <div class="panel">
-        <h2>🎛️ Parâmetros do Engenheiro de Corrida</h2>
+        <h2>🌍 1. Circuito & Equipe (10 Construtores)</h2>
+
+        <div class="control-group">
+          <label><span>Grande Prêmio (24 Etapas do Mundo)</span></label>
+          <select id="circuitSelect"></select>
+        </div>
+
+        <div class="control-group">
+          <label><span>Equipe / Chassi & Power Unit</span></label>
+          <select id="teamSelect"></select>
+        </div>
+
+        <div class="control-group">
+          <label><span>Piloto Selecionado</span></label>
+          <select id="driverSelect"></select>
+        </div>
+
+        <div class="specs-box">
+          <div class="specs-item"><span>Chassi / Motor</span><strong id="specChassis">W16 • Mercedes M16</strong></div>
+          <div class="specs-item"><span>Eficiência Aero / DRS</span><strong id="specAero">94% • +21.5 km/h</strong></div>
+          <div class="specs-item"><span>Média Pit Crew Equipe</span><strong id="specPitStop">2.35 s</strong></div>
+          <div class="specs-item"><span>Fator Desgaste Chassi</span><strong id="specTireDeg">0.97x (Gentil)</strong></div>
+        </div>
+
+        <div class="section-divider">
+          <h2>🔧 2. Setup Mecânico & Aerodinâmico do Carro</h2>
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Ângulo de Asa (Downforce 1–50)</span>
+            <span class="val-tag" id="wingVal">34 (Ótimo: 34)</span>
+          </label>
+          <input type="range" id="wingSlider" min="5" max="50" value="34" />
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Altura do Assoalho / Ride Height (mm)</span>
+            <span class="val-tag" id="rideVal">30 mm</span>
+          </label>
+          <input type="range" id="rideSlider" min="22" max="45" value="30" />
+        </div>
+
+        <div class="control-group">
+          <label><span>Modo de Bateria / Motor (ERS Deployment)</span></label>
+          <select id="ersSelect">
+            <option value="BALANCED" selected>⚡ Balanced Race Mode (Padrão Corrida)</option>
+            <option value="QUALY_PUSH">🔥 Overtake / Push (+Potência, +Desgaste Térmico)</option>
+            <option value="HARVEST_SAVE">🔋 Lift & Coast / Harvest (-Desgaste, Economia)</option>
+          </select>
+        </div>
+
+        <div class="section-divider">
+          <h2>🛞 3. Estratégia de Pneus & Clima da Pista</h2>
+        </div>
 
         <div class="control-group">
           <label><span>Estratégia de Compostos (1-Stop)</span></label>
           <select id="strategySelect">
-            <option value="MEDIUM-HARD" selected>🟡 Medium → ⚪ Hard (Padrão Campeão)</option>
+            <option value="MEDIUM-HARD" selected>🟡 Medium → ⚪ Hard (Equilibrado)</option>
             <option value="SOFT-HARD">🔴 Soft → ⚪ Hard (Ataque na Largada)</option>
-            <option value="SOFT-MEDIUM">🔴 Soft → 🟡 Medium (Agressivo Alto Desgaste)</option>
+            <option value="SOFT-MEDIUM">🔴 Soft → 🟡 Medium (Stint Curto Agressivo)</option>
           </select>
         </div>
 
         <div class="control-group">
-          <label><span>Volta do Pit Stop (Box Lap)</span><span id="pitLapVal">Volta 28</span></label>
-          <input type="range" id="pitLapSlider" min="15" max="55" value="28" />
+          <label><span>Volta do Pit Stop (Box Lap)</span><span class="val-tag" id="pitLapVal">Volta 28</span></label>
+          <input type="range" id="pitLapSlider" min="10" max="58" value="28" />
         </div>
 
         <div class="control-group">
-          <label><span>Temperatura da Pista (°C)</span><span id="trackTempVal">42 °C</span></label>
-          <input type="range" id="trackTempSlider" min="25" max="55" value="42" />
-        </div>
-
-        <div class="control-group">
-          <label><span>Altitude do Circuito (m)</span><span id="altitudeVal">2240 m (México)</span></label>
-          <input type="range" id="altitudeSlider" min="0" max="2500" step="20" value="2240" />
+          <label><span>Temperatura do Asfalto (°C)</span><span class="val-tag" id="trackTempVal">38 °C</span></label>
+          <input type="range" id="trackTempSlider" min="15" max="58" value="38" />
         </div>
 
         <div class="radio-box">
-          <div class="radio-title">📻 PIT-WALL AI ENGINEER → KIMI #12:</div>
+          <div class="radio-title" id="radioHeader">📻 PIT-WALL AI ENGINEER:</div>
           <div id="radioMsg"></div>
         </div>
       </div>
 
       <div class="charts-col">
         <div class="panel">
-          <h2>📈 Ritmo de Corrida Volta a Volta — Queima de Combustível vs. Cliff Térmico do Pneu</h2>
+          <h2>
+            <span>📈 Simulação Volta a Volta — Carro Escolhido vs. Degradação Térmica & Combustível</span>
+            <span style="font-size:0.78rem; color:var(--muted); font-family:'JetBrains Mono',monospace;" id="chartCircuitTag"></span>
+          </h2>
           <div class="chart-wrap">
             <canvas id="lapChart"></canvas>
           </div>
         </div>
+
         <div class="panel">
-          <h2>⏱️ Curva de Otimização da Janela de Pit Stop (Tempo Total de Prova por Volta de Parada)</h2>
+          <h2>⏱️ Curva de Otimização da Janela de Box (Penalidade em Segundos por Volta de Parada)</h2>
           <div class="chart-wrap">
             <canvas id="windowChart"></canvas>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>🏁 Comparativo Geral das 10 Equipes nesta Pista (Tempo Estimado de Volta em Ritmo de Corrida)</h2>
+          <div class="chart-wrap">
+            <canvas id="teamsChart"></canvas>
           </div>
         </div>
       </div>
@@ -168,10 +276,45 @@
   </div>
 
   <script>
-    const TOTAL_LAPS = 71;
-    const BASE_LAP = 77.60;
-    const FUEL_EFFECT = 0.055;
-    const PIT_LOSS = 21.8;
+    const CIRCUITS = [
+      { id: "bahrain", round: 1, gp_name: "Bahrain GP (Sakhir)", flag: "🇧🇭", race_date: "2026-03-08", total_laps: 57, altitude_m: 7, lat: 26.0325, lon: 50.5106, pit_loss_sec: 22.9, base_lap_sec: 92.6, fuel_burn: 0.058, pirelli: ["C1","C2","C3"], abrasiveness: 1.32, downforce: 0.58, power: 0.72, sc_prob: 58, temp_c: 31, opt_wing: 28 },
+      { id: "jeddah", round: 2, gp_name: "Saudi Arabian GP (Jeddah)", flag: "🇸🇦", race_date: "2026-03-15", total_laps: 50, altitude_m: 4, lat: 21.6319, lon: 39.1044, pit_loss_sec: 20.6, base_lap_sec: 90.4, fuel_burn: 0.062, pirelli: ["C2","C3","C4"], abrasiveness: 0.88, downforce: 0.44, power: 0.86, sc_prob: 84, temp_c: 32, opt_wing: 21 },
+      { id: "melbourne", round: 3, gp_name: "Australian GP (Melbourne)", flag: "🇦🇺", race_date: "2026-03-29", total_laps: 58, altitude_m: 12, lat: -37.8497, lon: 144.968, pit_loss_sec: 19.4, base_lap_sec: 79.8, fuel_burn: 0.052, pirelli: ["C3","C4","C5"], abrasiveness: 0.94, downforce: 0.62, power: 0.68, sc_prob: 72, temp_c: 35, opt_wing: 31 },
+      { id: "suzuka", round: 4, gp_name: "Japanese GP (Suzuka)", flag: "🇯🇵", race_date: "2026-04-05", total_laps: 53, altitude_m: 45, lat: 34.8431, lon: 136.5407, pit_loss_sec: 22.7, base_lap_sec: 91.8, fuel_burn: 0.060, pirelli: ["C1","C2","C3"], abrasiveness: 1.28, downforce: 0.82, power: 0.65, sc_prob: 52, temp_c: 29, opt_wing: 38 },
+      { id: "shanghai", round: 5, gp_name: "Chinese GP (Shanghai)", flag: "🇨🇳", race_date: "2026-04-19", total_laps: 56, altitude_m: 5, lat: 31.3389, lon: 121.2197, pit_loss_sec: 23.4, base_lap_sec: 96.2, fuel_burn: 0.056, pirelli: ["C2","C3","C4"], abrasiveness: 1.16, downforce: 0.66, power: 0.70, sc_prob: 61, temp_c: 33, opt_wing: 32 },
+      { id: "miami", round: 6, gp_name: "Miami GP", flag: "🇺🇸", race_date: "2026-05-03", total_laps: 57, altitude_m: 3, lat: 25.9581, lon: -80.2389, pit_loss_sec: 20.8, base_lap_sec: 89.9, fuel_burn: 0.055, pirelli: ["C2","C3","C4"], abrasiveness: 0.98, downforce: 0.54, power: 0.76, sc_prob: 67, temp_c: 46, opt_wing: 26 },
+      { id: "imola", round: 7, gp_name: "Emilia Romagna GP (Imola)", flag: "🇮🇹", race_date: "2026-05-17", total_laps: 63, altitude_m: 47, lat: 44.3439, lon: 11.7167, pit_loss_sec: 27.6, base_lap_sec: 77.9, fuel_burn: 0.049, pirelli: ["C3","C4","C5"], abrasiveness: 1.02, downforce: 0.72, power: 0.58, sc_prob: 65, temp_c: 37, opt_wing: 35 },
+      { id: "monaco", round: 8, gp_name: "Monaco GP (Monte Carlo)", flag: "🇲🇨", race_date: "2026-05-24", total_laps: 78, altitude_m: 18, lat: 43.7347, lon: 7.4206, pit_loss_sec: 19.6, base_lap_sec: 73.8, fuel_burn: 0.036, pirelli: ["C3","C4","C5"], abrasiveness: 0.72, downforce: 0.98, power: 0.25, sc_prob: 81, temp_c: 41, opt_wing: 50 },
+      { id: "barcelona", round: 9, gp_name: "Spanish GP (Barcelona)", flag: "🇪🇸", race_date: "2026-05-31", total_laps: 66, altitude_m: 115, lat: 41.57, lon: 2.2611, pit_loss_sec: 21.9, base_lap_sec: 76.7, fuel_burn: 0.048, pirelli: ["C1","C2","C3"], abrasiveness: 1.29, downforce: 0.84, power: 0.56, sc_prob: 38, temp_c: 43, opt_wing: 40 },
+      { id: "montreal", round: 10, gp_name: "Canadian GP (Montreal)", flag: "🇨🇦", race_date: "2026-06-14", total_laps: 70, altitude_m: 13, lat: 45.5, lon: -73.5228, pit_loss_sec: 18.8, base_lap_sec: 74.3, fuel_burn: 0.046, pirelli: ["C3","C4","C5"], abrasiveness: 0.86, downforce: 0.48, power: 0.78, sc_prob: 76, temp_c: 34, opt_wing: 24 },
+      { id: "spielberg", round: 11, gp_name: "Austrian GP (Red Bull Ring)", flag: "🇦🇹", race_date: "2026-06-28", total_laps: 71, altitude_m: 678, lat: 47.2197, lon: 14.7647, pit_loss_sec: 20.9, base_lap_sec: 67.8, fuel_burn: 0.043, pirelli: ["C3","C4","C5"], abrasiveness: 1.08, downforce: 0.56, power: 0.79, sc_prob: 54, temp_c: 39, opt_wing: 27 },
+      { id: "silverstone", round: 12, gp_name: "British GP (Silverstone)", flag: "🇬🇧", race_date: "2026-07-05", total_laps: 52, altitude_m: 153, lat: 52.0786, lon: -1.0169, pit_loss_sec: 20.4, base_lap_sec: 88.7, fuel_burn: 0.061, pirelli: ["C1","C2","C3"], abrasiveness: 1.26, downforce: 0.80, power: 0.74, sc_prob: 68, temp_c: 31, opt_wing: 36 },
+      { id: "spa", round: 13, gp_name: "Belgian GP (Spa-Francorchamps)", flag: "🇧🇪", race_date: "2026-07-19", total_laps: 44, altitude_m: 410, lat: 50.4372, lon: 5.9714, pit_loss_sec: 22.8, base_lap_sec: 106.4, fuel_burn: 0.072, pirelli: ["C2","C3","C4"], abrasiveness: 1.22, downforce: 0.52, power: 0.88, sc_prob: 66, temp_c: 28, opt_wing: 23 },
+      { id: "budapest", round: 14, gp_name: "Hungarian GP (Hungaroring)", flag: "🇭🇺", race_date: "2026-07-26", total_laps: 70, altitude_m: 226, lat: 47.5789, lon: 19.2486, pit_loss_sec: 20.6, base_lap_sec: 78.2, fuel_burn: 0.047, pirelli: ["C3","C4","C5"], abrasiveness: 1.12, downforce: 0.92, power: 0.42, sc_prob: 42, temp_c: 47, opt_wing: 45 },
+      { id: "zandvoort", round: 15, gp_name: "Dutch GP (Zandvoort)", flag: "🇳🇱", race_date: "2026-08-30", total_laps: 72, altitude_m: 6, lat: 52.3888, lon: 4.5409, pit_loss_sec: 21.1, base_lap_sec: 72.9, fuel_burn: 0.045, pirelli: ["C1","C2","C3"], abrasiveness: 1.24, downforce: 0.88, power: 0.51, sc_prob: 59, temp_c: 30, opt_wing: 43 },
+      { id: "monza", round: 16, gp_name: "Italian GP (Monza)", flag: "🇮🇹", race_date: "2026-09-06", total_laps: 53, altitude_m: 162, lat: 45.6156, lon: 9.2811, pit_loss_sec: 24.3, base_lap_sec: 81.9, fuel_burn: 0.056, pirelli: ["C3","C4","C5"], abrasiveness: 0.91, downforce: 0.16, power: 0.98, sc_prob: 49, temp_c: 41, opt_wing: 8 },
+      { id: "baku", round: 17, gp_name: "Azerbaijan GP (Baku)", flag: "🇦🇿", race_date: "2026-09-20", total_laps: 51, altitude_m: -28, lat: 40.3725, lon: 49.8533, pit_loss_sec: 20.1, base_lap_sec: 103.5, fuel_burn: 0.062, pirelli: ["C3","C4","C5"], abrasiveness: 0.85, downforce: 0.36, power: 0.90, sc_prob: 78, temp_c: 38, opt_wing: 18 },
+      { id: "singapore", round: 18, gp_name: "Singapore GP (Marina Bay)", flag: "🇸🇬", race_date: "2026-10-04", total_laps: 62, altitude_m: 4, lat: 1.2914, lon: 103.864, pit_loss_sec: 28.4, base_lap_sec: 93.8, fuel_burn: 0.054, pirelli: ["C3","C4","C5"], abrasiveness: 1.05, downforce: 0.94, power: 0.40, sc_prob: 92, temp_c: 35, opt_wing: 47 },
+      { id: "austin", round: 19, gp_name: "United States GP (COTA - Austin)", flag: "🇺🇸", race_date: "2026-10-18", total_laps: 56, altitude_m: 165, lat: 30.1328, lon: -97.6411, pit_loss_sec: 20.5, base_lap_sec: 96.4, fuel_burn: 0.058, pirelli: ["C2","C3","C4"], abrasiveness: 1.21, downforce: 0.74, power: 0.68, sc_prob: 56, temp_c: 42, opt_wing: 35 },
+      { id: "mexico", round: 20, gp_name: "Mexico City GP (Hermanos Rodríguez)", flag: "🇲🇽", race_date: "2026-10-25", total_laps: 71, altitude_m: 2240, lat: 19.4042, lon: -99.0907, pit_loss_sec: 21.8, base_lap_sec: 77.6, fuel_burn: 0.055, pirelli: ["C3","C4","C5"], abrasiveness: 1.00, downforce: 0.95, power: 0.75, sc_prob: 62, temp_c: 42, opt_wing: 48 },
+      { id: "interlagos", round: 21, gp_name: "São Paulo GP (Interlagos)", flag: "🇧🇷", race_date: "2026-11-08", total_laps: 71, altitude_m: 765, lat: -23.7036, lon: -46.6997, pit_loss_sec: 19.8, base_lap_sec: 71.8, fuel_burn: 0.046, pirelli: ["C3","C4","C5"], abrasiveness: 1.12, downforce: 0.70, power: 0.74, sc_prob: 79, temp_c: 38, opt_wing: 34 },
+      { id: "las_vegas", round: 22, gp_name: "Las Vegas GP (Strip Circuit)", flag: "🇺🇸", race_date: "2026-11-21", total_laps: 50, altitude_m: 610, lat: 36.1147, lon: -115.1728, pit_loss_sec: 20.4, base_lap_sec: 94.1, fuel_burn: 0.063, pirelli: ["C3","C4","C5"], abrasiveness: 0.84, downforce: 0.26, power: 0.94, sc_prob: 74, temp_c: 18, opt_wing: 14 },
+      { id: "qatar", round: 23, gp_name: "Qatar GP (Lusail)", flag: "🇶🇦", race_date: "2026-11-29", total_laps: 57, altitude_m: 15, lat: 25.49, lon: 51.4542, pit_loss_sec: 25.1, base_lap_sec: 83.2, fuel_burn: 0.055, pirelli: ["C1","C2","C3"], abrasiveness: 1.35, downforce: 0.85, power: 0.64, sc_prob: 55, temp_c: 32, opt_wing: 41 },
+      { id: "abu_dhabi", round: 24, gp_name: "Abu Dhabi GP (Yas Marina)", flag: "🇦🇪", race_date: "2026-12-06", total_laps: 58, altitude_m: 5, lat: 24.4672, lon: 54.6031, pit_loss_sec: 21.5, base_lap_sec: 86.1, fuel_burn: 0.054, pirelli: ["C3","C4","C5"], abrasiveness: 0.96, downforce: 0.64, power: 0.72, sc_prob: 51, temp_c: 31, opt_wing: 31 }
+    ];
+
+    const TEAMS = [
+      { id: "mclaren", name: "McLaren Formula 1 Team", chassis: "MCL39", pu: "Mercedes M16", color: "#ff8000", drivers: ["#4 Lando Norris", "#81 Oscar Piastri"], offset: -0.04, aero: 0.97, drs: 21.0, pu_rating: 0.96, deg_mult: 0.92, pit_sec: 2.18 },
+      { id: "ferrari", name: "Scuderia Ferrari HP", chassis: "SF-25", pu: "Ferrari 066/14", color: "#ef4444", drivers: ["#16 Charles Leclerc", "#44 Lewis Hamilton"], offset: -0.02, aero: 0.95, drs: 22.4, pu_rating: 0.97, deg_mult: 0.95, pit_sec: 2.24 },
+      { id: "red_bull", name: "Oracle Red Bull Racing", chassis: "RB21", pu: "Honda RBPT", color: "#3b82f6", drivers: ["#1 Max Verstappen", "#30 Liam Lawson"], offset: -0.01, aero: 0.96, drs: 23.2, pu_rating: 0.95, deg_mult: 0.96, pit_sec: 2.09 },
+      { id: "mercedes", name: "Mercedes-AMG PETRONAS", chassis: "W16", pu: "Mercedes M16", color: "#00d2be", drivers: ["#12 Kimi Antonelli", "#63 George Russell"], offset: 0.00, aero: 0.94, drs: 21.5, pu_rating: 0.96, deg_mult: 0.97, pit_sec: 2.35 },
+      { id: "aston_martin", name: "Aston Martin Aramco", chassis: "AMR25", pu: "Mercedes M16", color: "#10b981", drivers: ["#14 Fernando Alonso", "#18 Lance Stroll"], offset: 0.38, aero: 0.89, drs: 20.4, pu_rating: 0.95, deg_mult: 1.03, pit_sec: 2.52 },
+      { id: "williams", name: "Atlassian Williams Racing", chassis: "FW47", pu: "Mercedes M16", color: "#38bdf8", drivers: ["#23 Alexander Albon", "#55 Carlos Sainz"], offset: 0.42, aero: 0.91, drs: 23.5, pu_rating: 0.96, deg_mult: 1.02, pit_sec: 2.48 },
+      { id: "racing_bulls", name: "Visa Cash App Racing Bulls", chassis: "VCARB 02", pu: "Honda RBPT", color: "#818cf8", drivers: ["#22 Yuki Tsunoda", "#6 Isack Hadjar"], offset: 0.46, aero: 0.89, drs: 21.6, pu_rating: 0.94, deg_mult: 1.02, pit_sec: 2.45 },
+      { id: "haas", name: "MoneyGram Haas F1 Team", chassis: "VF-25", pu: "Ferrari 066/14", color: "#cbd5e1", drivers: ["#31 Esteban Ocon", "#87 Oliver Bearman"], offset: 0.49, aero: 0.88, drs: 21.8, pu_rating: 0.96, deg_mult: 1.05, pit_sec: 2.65 },
+      { id: "alpine", name: "BWT Alpine F1 Team", chassis: "A525", pu: "Renault E-Tech", color: "#ec4899", drivers: ["#10 Pierre Gasly", "#7 Jack Doohan"], offset: 0.54, aero: 0.88, drs: 20.8, pu_rating: 0.89, deg_mult: 1.04, pit_sec: 2.58 },
+      { id: "sauber", name: "Stake F1 Team Kick Sauber (Audi)", chassis: "C45", pu: "Ferrari 066/14", color: "#4ade80", drivers: ["#27 Nico Hülkenberg", "#5 Gabriel Bortoleto"], offset: 0.62, aero: 0.86, drs: 20.5, pu_rating: 0.95, deg_mult: 1.06, pit_sec: 2.72 }
+    ];
 
     const COMPOUNDS = {
       SOFT:   { delta: 0.00, lin: 0.095, cliff: 18, quad: 0.018, color: '#ef4444' },
@@ -179,101 +322,227 @@
       HARD:   { delta: 1.05, lin: 0.028, cliff: 44, quad: 0.007, color: '#f8fafc' }
     };
 
+    let nextUpcomingCircuit = CIRCUITS[20]; // Default Interlagos if date check matches Nov
+
+    function detectNextGp() {
+      const todayIso = new Date().toISOString().slice(0, 10);
+      const upcoming = CIRCUITS.find(c => c.race_date >= todayIso) || CIRCUITS[20];
+      nextUpcomingCircuit = upcoming;
+      const badge = document.getElementById('nextGpBadge');
+      badge.textContent = `⏭️ PRÓXIMO GP: R${upcoming.round} ${upcoming.flag} ${upcoming.gp_name.toUpperCase()} (${upcoming.race_date})`;
+      badge.onclick = () => {
+        document.getElementById('circuitSelect').value = upcoming.id;
+        onCircuitChange();
+      };
+    }
+
+    function initSelectors() {
+      detectNextGp();
+      const cSel = document.getElementById('circuitSelect');
+      CIRCUITS.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        const isNext = c.id === nextUpcomingCircuit.id ? " ★ [PRÓXIMO GP]" : "";
+        opt.textContent = `R${String(c.round).padStart(2,'0')} ${c.flag} ${c.gp_name} (${c.total_laps} voltas)${isNext}`;
+        cSel.appendChild(opt);
+      });
+      cSel.value = nextUpcomingCircuit.id;
+
+      const tSel = document.getElementById('teamSelect');
+      TEAMS.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = `${t.name} (${t.chassis})`;
+        tSel.appendChild(opt);
+      });
+      tSel.value = "mercedes";
+      populateDrivers();
+    }
+
+    function populateDrivers() {
+      const team = TEAMS.find(t => t.id === document.getElementById('teamSelect').value);
+      const dSel = document.getElementById('driverSelect');
+      dSel.innerHTML = '';
+      team.drivers.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        dSel.appendChild(opt);
+      });
+      document.documentElement.style.setProperty('--accent', team.color);
+      document.getElementById('specChassis').textContent = `${team.chassis} • ${team.pu}`;
+      document.getElementById('specAero').textContent = `${Math.round(team.aero * 100)}% • +${team.drs} km/h`;
+      document.getElementById('specPitStop').textContent = `${team.pit_sec.toFixed(2)} s`;
+      document.getElementById('specTireDeg').textContent = `${team.deg_mult.toFixed(2)}x`;
+    }
+
+    async function fetchCircuitWeather(circuit) {
+      const statusEl = document.getElementById('weatherStatus');
+      statusEl.textContent = `Consultando satélite para ${circuit.flag} ${circuit.gp_name}...`;
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${circuit.lat}&longitude=${circuit.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const cur = data.current;
+        const estTrackTemp = Math.round(Math.max(15, Math.min(58, cur.temperature_2m + 11)));
+        statusEl.innerHTML = `${circuit.flag} Ar: <strong>${cur.temperature_2m}°C</strong> | Asfalto Est.: <strong>${estTrackTemp}°C</strong> | Vento: ${cur.wind_speed_10m} km/h | Chuva: ${cur.precipitation} mm`;
+      } catch (e) {
+        statusEl.textContent = `${circuit.flag} Clima Padrão FIA: Asfalto ${circuit.temp_c}°C | Alt: ${circuit.altitude_m}m`;
+      }
+    }
+
     function computeAero(altM, tempC) {
       const rho0 = 1.225, T0 = 288.15, L = 0.0065, g = 9.80665, R = 287.058;
       const pRatio = Math.pow(1 - (L * Math.max(0, altM)) / T0, g / (R * L));
       const rho = rho0 * pRatio * (T0 / (tempC + 273.15));
-      return { rho, reductionPct: (1 - rho / rho0) * 100 };
+      return { rho, ratio: rho / rho0, reductionPct: (1 - rho / rho0) * 100 };
     }
 
-    function predictLap(lap, compName, stintAge, trackTemp) {
+    function evaluateSetup(circuit, team, wing, rideMm, ersMode) {
+      const aero = computeAero(circuit.altitude_m, 24);
+      const wingDiff = wing - circuit.opt_wing;
+      const wingPenalty = 0.0022 * wingDiff * wingDiff;
+      const rideDiff = rideMm - 30.0;
+      const ridePenalty = 0.0035 * rideDiff * rideDiff;
+
+      const ersMap = {
+        QUALY_PUSH: { lap: -0.35, deg: 1.06 },
+        BALANCED:   { lap: 0.00,  deg: 1.00 },
+        HARVEST_SAVE: { lap: 0.28, deg: 0.95 }
+      };
+      const ers = ersMap[ersMode] || ersMap.BALANCED;
+
+      const aeroBonus = (0.95 - team.aero) * 2.8 * circuit.downforce;
+      const puBonus = (0.96 - team.pu_rating) * 2.5 * circuit.power;
+      const lapDelta = team.offset + aeroBonus + puBonus + wingPenalty + ridePenalty + ers.lap;
+
+      const effectiveDrag = (wing * 0.62) * aero.ratio / team.aero;
+      const topSpeed = 338.0 + (team.pu_rating - 0.90) * 110.0 + team.drs - effectiveDrag;
+      const cornerSpeed = 165.0 + (wing * 1.15 * aero.ratio * team.aero) - Math.max(0, rideDiff * 0.8);
+
+      const slidingFactor = Math.max(-0.06, -wingDiff * 0.0055);
+      const degMult = circuit.abrasiveness * team.deg_mult * (1.0 + slidingFactor) * ers.deg;
+
+      return { lapDelta, topSpeed, cornerSpeed, degMult, aero };
+    }
+
+    function predictLap(circuit, setup, lap, compName, stintAge, trackTemp) {
       const c = COMPOUNDS[compName];
-      const fuel = (TOTAL_LAPS - lap) * FUEL_EFFECT;
-      const thermal = 1 + Math.max(-0.15, (trackTemp - 40) * 0.012);
+      const fuel = (circuit.total_laps - lap) * circuit.fuel_burn;
+      const thermal = (1 + Math.max(-0.15, (trackTemp - 40) * 0.012)) * setup.degMult;
       const overCliff = Math.max(0, stintAge - c.cliff);
-      return BASE_LAP + c.delta + fuel + (c.lin * stintAge + c.quad * overCliff * overCliff) * thermal;
+      return circuit.base_lap_sec + setup.lapDelta + c.delta + fuel + (c.lin * stintAge + c.quad * overCliff * overCliff) * thermal;
     }
 
-    function simulateStints(c1, c2, pitLap, trackTemp) {
+    function simulateStints(circuit, team, setup, c1, c2, pitLap, trackTemp) {
       const laps = [];
       let total = 0;
-      for (let l = 1; l <= TOTAL_LAPS; l++) {
+      const effectivePitLoss = circuit.pit_loss_sec + (team.pit_sec - 2.25);
+      for (let l = 1; l <= circuit.total_laps; l++) {
         const isFirst = l <= pitLap;
         const comp = isFirst ? c1 : c2;
         const age = isFirst ? l : (l - pitLap);
-        let t = predictLap(l, comp, age, trackTemp);
-        const pitPenalty = (!isFirst && age === 1) ? PIT_LOSS : 0;
+        const t = predictLap(circuit, setup, l, comp, age, trackTemp);
+        const pitPenalty = (!isFirst && age === 1) ? effectivePitLoss : 0;
         total += t + pitPenalty;
-        laps.push({ lap: l, pace: Number(t.toFixed(3)), totalWithPit: Number((t + pitPenalty).toFixed(3)), comp });
+        laps.push({ lap: l, pace: Number(t.toFixed(3)), comp });
       }
       return { laps, total };
     }
 
     let lapChartInstance = null;
     let windowChartInstance = null;
+    let teamsChartInstance = null;
+
+    function onCircuitChange() {
+      const circuit = CIRCUITS.find(c => c.id === document.getElementById('circuitSelect').value);
+      document.getElementById('wingSlider').value = circuit.opt_wing;
+      document.getElementById('trackTempSlider').value = circuit.temp_c;
+      const pitSlider = document.getElementById('pitLapSlider');
+      pitSlider.min = Math.max(8, Math.floor(circuit.total_laps * 0.18));
+      pitSlider.max = Math.min(circuit.total_laps - 8, Math.floor(circuit.total_laps * 0.78));
+      pitSlider.value = Math.round(circuit.total_laps * 0.40);
+      fetchCircuitWeather(circuit);
+      updateDashboard();
+    }
 
     function updateDashboard() {
+      const circuit = CIRCUITS.find(c => c.id === document.getElementById('circuitSelect').value);
+      const team = TEAMS.find(t => t.id === document.getElementById('teamSelect').value);
+      const driver = document.getElementById('driverSelect').value;
       const [c1, c2] = document.getElementById('strategySelect').value.split('-');
+      const wing = Number(document.getElementById('wingSlider').value);
+      const rideMm = Number(document.getElementById('rideSlider').value);
+      const ersMode = document.getElementById('ersSelect').value;
       const pitLap = Number(document.getElementById('pitLapSlider').value);
       const trackTemp = Number(document.getElementById('trackTempSlider').value);
-      const altitude = Number(document.getElementById('altitudeSlider').value);
 
-      document.getElementById('pitLapVal').textContent = `Volta ${pitLap}`;
+      document.getElementById('headerBadge').textContent = `${circuit.flag} R${circuit.round} • ${circuit.gp_name.toUpperCase()} • ${team.name.toUpperCase()} (${driver})`;
+      document.getElementById('chartCircuitTag').textContent = `${circuit.flag} ${circuit.gp_name} (${circuit.total_laps} voltas • Alt: ${circuit.altitude_m}m)`;
+      document.getElementById('wingVal').textContent = `${wing} (Ótimo Pista: ${circuit.opt_wing})`;
+      document.getElementById('rideVal').textContent = `${rideMm} mm`;
+      document.getElementById('pitLapVal').textContent = `Volta ${pitLap} / ${circuit.total_laps}`;
       document.getElementById('trackTempVal').textContent = `${trackTemp} °C`;
-      document.getElementById('altitudeVal').textContent = `${altitude} m`;
 
-      const aero = computeAero(altitude, 24);
-      document.getElementById('kpiAero').textContent = `-${aero.reductionPct.toFixed(1)}%`;
-      document.getElementById('kpiDensity').textContent = `Densidade do ar: ${aero.rho.toFixed(3)} kg/m³`;
+      const setup = evaluateSetup(circuit, team, wing, rideMm, ersMode);
 
-      // Compute optimization curve across pit laps 15..55
-      let bestLap = 28, bestTime = Infinity;
-      const windowLabels = [], windowTimes = [];
-      for (let p = 15; p <= 55; p++) {
-        const sim = simulateStints(c1, c2, p, trackTemp);
+      document.getElementById('kpiTopSpeed').textContent = `${setup.topSpeed.toFixed(1)} km/h`;
+      document.getElementById('kpiCornerSpeed').textContent = `Apex Curva: ${setup.cornerSpeed.toFixed(1)} km/h`;
+      document.getElementById('kpiAero').textContent = `-${setup.aero.reductionPct.toFixed(1)}%`;
+      document.getElementById('kpiDensity').textContent = `Ar: ${setup.aero.rho.toFixed(3)} kg/m³ (${circuit.altitude_m}m)`;
+      document.getElementById('kpiPirelliSub').textContent = `Alocação Pirelli: ${circuit.pirelli.join(' • ')}`;
+      document.getElementById('kpiSafetyCar').textContent = `${circuit.sc_prob}%`;
+      document.getElementById('kpiPitLossSub').textContent = `Pit Loss: ${circuit.pit_loss_sec}s (Box: ${team.pit_sec}s)`;
+
+      const minPit = Number(document.getElementById('pitLapSlider').min);
+      const maxPit = Number(document.getElementById('pitLapSlider').max);
+      let bestLap = minPit, bestTime = Infinity;
+      const windowLabels = [], windowTotals = [];
+
+      for (let p = minPit; p <= maxPit; p++) {
+        const sim = simulateStints(circuit, team, setup, c1, c2, p, trackTemp);
         windowLabels.push(`V${p}`);
-        windowTimes.push(Number((sim.total - 5500).toFixed(2)));
+        windowTotals.push(sim.total);
         if (sim.total < bestTime) { bestTime = sim.total; bestLap = p; }
       }
 
-      const chosenSim = simulateStints(c1, c2, pitLap, trackTemp);
+      const chosenSim = simulateStints(circuit, team, setup, c1, c2, pitLap, trackTemp);
       const deltaOpt = chosenSim.total - bestTime;
-      const wornNext = predictLap(bestLap + 1, c1, bestLap + 1, trackTemp);
-      const freshNext = predictLap(bestLap + 1, c2, 1, trackTemp);
+      const wornNext = predictLap(circuit, setup, bestLap + 1, c1, bestLap + 1, trackTemp);
+      const freshNext = predictLap(circuit, setup, bestLap + 1, c2, 1, trackTemp);
       const undercutGain = wornNext - freshNext;
 
       document.getElementById('kpiOptimalLap').textContent = `Volta ${bestLap}`;
-      document.getElementById('kpiWindowSub').textContent = `Janela ideal (${c1}→${c2}): Voltas ${bestLap - 2} a ${bestLap + 2}`;
-      document.getElementById('kpiUndercut').textContent = `+${undercutGain.toFixed(2)} s/volta`;
-      document.getElementById('kpiDelta').textContent = `${deltaOpt >= 0 ? '+' : ''}${deltaOpt.toFixed(2)} s`;
-      document.getElementById('kpiDelta').style.color = deltaOpt < 1.5 ? '#00d2be' : (deltaOpt < 5 ? '#facc15' : '#ef4444');
-      document.getElementById('kpiTotalTime').textContent = `Diferença para a parada ótima (Volta ${bestLap})`;
+      document.getElementById('kpiWindowSub').textContent = `Janela ideal (${c1}→${c2}): Voltas ${Math.max(minPit, bestLap - 2)}–${Math.min(maxPit, bestLap + 2)}`;
+      document.getElementById('kpiUndercut').textContent = `${undercutGain >= 0 ? '+' : ''}${undercutGain.toFixed(2)} s/volta`;
 
-      // Engineer radio synthesis
-      const radioEl = document.getElementById('radioMsg');
-      if (Math.abs(pitLap - bestLap) <= 2) {
-        radioEl.innerHTML = `"Kimi, janela de parada perfeita na <strong>Volta ${pitLap}</strong>! Evitamos o cliff térmico do pneu <strong>${c1}</strong> e ganhamos <strong>+${undercutGain.toFixed(2)}s</strong> no undercut colocando o <strong>${c2}</strong>. Pace de campeão no México!"`;
-      } else if (pitLap > bestLap + 2) {
-        radioEl.innerHTML = `"Atenção Kimi: estender o <strong>${c1}</strong> até a Volta ${pitLap} ultrapassa o cliff térmico a ${trackTemp}°C. Você perde <strong>+${deltaOpt.toFixed(2)}s</strong> no tempo total. Recomendamos Box na <strong>Volta ${bestLap}</strong>!"`;
-      } else {
-        radioEl.innerHTML = `"Parar cedo demais na Volta ${pitLap} força um stint longo de ${TOTAL_LAPS - pitLap} voltas no <strong>${c2}</strong> (+${deltaOpt.toFixed(2)}s vs ótimo). Aguarde até a <strong>Volta ${bestLap}</strong> para atacar."`;
-      }
+      // Engineer Radio message
+      document.getElementById('radioHeader').textContent = `📻 RÁDIO ENGENHEIRO (${team.chassis}) → ${driver.toUpperCase()}:`;
+      const wingDiff = Math.abs(wing - circuit.opt_wing);
+      const wingNote = wingDiff <= 3
+        ? `Setup de asa (${wing}) cravado na janela aerodinâmica ótima de ${circuit.gp_name} (${setup.topSpeed.toFixed(0)} km/h no DRS).`
+        : (wing < circuit.opt_wing
+            ? `Asa baixa (${wing} vs ótimo ${circuit.opt_wing}) dá ${setup.topSpeed.toFixed(0)} km/h na reta, mas aumenta o escorregamento térmico dos pneus!`
+            : `Asa carregada (${wing} vs ótimo ${circuit.opt_wing}) protege os pneus em curva, mas custa velocidade final na reta.`);
 
-      // Update Charts
-      const lapLabels = chosenSim.laps.map(x => `V${x.lap}`);
-      const lapPaces = chosenSim.laps.map(x => x.pace);
-      const pointColors = chosenSim.laps.map(x => COMPOUNDS[x.comp].color);
+      const pitNote = Math.abs(pitLap - bestLap) <= 2
+        ? `Box na <strong>Volta ${pitLap}</strong> é a estratégia ótima (+${undercutGain.toFixed(2)}s no undercut para o ${c2}).`
+        : `Parar na Volta ${pitLap} custa <strong>+${deltaOpt.toFixed(2)}s</strong> vs a janela ótima na <strong>Volta ${bestLap}</strong>.`;
 
+      document.getElementById('radioMsg').innerHTML = `"${wingNote} ${pitNote} Risco histórico de Safety Car nesta pista: <strong>${circuit.sc_prob}%</strong>."`;
+
+      // Chart 1: Lap-by-lap pace
       if (lapChartInstance) lapChartInstance.destroy();
       lapChartInstance = new Chart(document.getElementById('lapChart'), {
         type: 'line',
         data: {
-          labels: lapLabels,
+          labels: chosenSim.laps.map(x => `V${x.lap}`),
           datasets: [{
-            label: 'Tempo de Volta s/ Pit Loss (s)',
-            data: lapPaces,
-            borderColor: '#00d2be',
-            pointBackgroundColor: pointColors,
+            label: `Ritmo por Volta — ${driver} (${team.chassis})`,
+            data: chosenSim.laps.map(x => x.pace),
+            borderColor: team.color,
+            pointBackgroundColor: chosenSim.laps.map(x => COMPOUNDS[x.comp].color),
             pointRadius: 3,
             borderWidth: 2,
             tension: 0.25
@@ -283,32 +552,27 @@
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#f8fafc' } } },
           scales: {
-            x: { ticks: { color: '#94a3b8', maxTicksLimit: 14 }, grid: { color: 'rgba(148,163,184,0.1)' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' }, title: { display: true, text: 'Segundos (s)', color: '#94a3b8' } }
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 14 }, grid: { color: 'rgba(148,163,184,0.08)' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.08)' }, title: { display: true, text: 'Tempo de Volta (s)', color: '#94a3b8' } }
           }
         }
       });
 
-      const optSim = simulateStints(c1, c2, bestLap, trackTemp);
-      const curveDeltas = [];
-      for (let p = 15; p <= 55; p++) {
-        const s = simulateStints(c1, c2, p, trackTemp);
-        curveDeltas.push(Number((s.total - bestTime).toFixed(2)));
-      }
-
+      // Chart 2: Pit window optimization curve
+      const curveDeltas = windowTotals.map(t => Number((t - bestTime).toFixed(2)));
       if (windowChartInstance) windowChartInstance.destroy();
       windowChartInstance = new Chart(document.getElementById('windowChart'), {
         type: 'bar',
         data: {
           labels: windowLabels,
           datasets: [{
-            label: 'Tempo Perdido vs. Volta Ótima de Pit Stop (s)',
+            label: 'Segundos Perdidos vs. Volta Ótima de Pit Stop (s)',
             data: curveDeltas,
             backgroundColor: windowLabels.map((_, idx) => {
-              const lap = idx + 15;
+              const lap = idx + minPit;
               if (lap === pitLap) return '#ef4444';
-              if (Math.abs(lap - bestLap) <= 2) return '#00d2be';
-              return 'rgba(148, 163, 184, 0.35)';
+              if (Math.abs(lap - bestLap) <= 2) return team.color;
+              return 'rgba(148, 163, 184, 0.32)';
             })
           }]
         },
@@ -316,17 +580,53 @@
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#f8fafc' } } },
           scales: {
-            x: { ticks: { color: '#94a3b8', maxTicksLimit: 15 }, grid: { display: false } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' }, title: { display: true, text: '+Delta (s)', color: '#94a3b8' } }
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 16 }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.08)' }, title: { display: true, text: '+Delta Tempo Total (s)', color: '#94a3b8' } }
+          }
+        }
+      });
+
+      // Chart 3: All 10 teams comparison on this circuit (Lap 15 Medium tire pace with each team's optimal setup)
+      const teamRanking = TEAMS.map(t => {
+        const s = evaluateSetup(circuit, t, circuit.opt_wing, 30, 'BALANCED');
+        const lapPace = predictLap(circuit, s, Math.round(circuit.total_laps * 0.3), 'MEDIUM', 10, trackTemp);
+        return { name: `${t.name.split(' ')[0]} (${t.chassis})`, pace: Number(lapPace.toFixed(3)), color: t.color, id: t.id };
+      }).sort((a, b) => a.pace - b.pace);
+
+      const fastestPace = teamRanking[0].pace;
+      if (teamsChartInstance) teamsChartInstance.destroy();
+      teamsChartInstance = new Chart(document.getElementById('teamsChart'), {
+        type: 'bar',
+        data: {
+          labels: teamRanking.map(x => x.name),
+          datasets: [{
+            label: 'Gap de Ritmo de Corrida por Volta vs. Líder na Pista (+s/volta)',
+            data: teamRanking.map(x => Number((x.pace - fastestPace + 0.02).toFixed(3))),
+            backgroundColor: teamRanking.map(x => x.color)
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#f8fafc' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.08)' }, title: { display: true, text: 'Gap por Volta (+segundos)', color: '#94a3b8' } },
+            y: { ticks: { color: '#f8fafc' }, grid: { display: false } }
           }
         }
       });
     }
 
-    ['strategySelect', 'pitLapSlider', 'trackTempSlider', 'altitudeSlider'].forEach(id => {
+    initSelectors();
+    document.getElementById('circuitSelect').addEventListener('change', onCircuitChange);
+    document.getElementById('teamSelect').addEventListener('change', () => {
+      populateDrivers();
+      updateDashboard();
+    });
+    ['driverSelect', 'wingSlider', 'rideSlider', 'ersSelect', 'strategySelect', 'pitLapSlider', 'trackTempSlider'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateDashboard);
     });
-    updateDashboard();
+    onCircuitChange();
   </script>
 </body>
 </html>

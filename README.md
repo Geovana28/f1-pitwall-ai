@@ -1,62 +1,59 @@
-# 🏎️ F1 Pit-Wall Telemetry & Race Strategy AI — Mexico City GP (Kimi Antonelli #12 Edition)
+# 🏎️ F1 Global Pit-Wall Telemetry, Car Setup & Race Strategy AI (24 Circuits • 10 Teams)
 
 [![Live Interactive Pit-Wall](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-kimi-telemetry/)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Pytest](https://img.shields.io/badge/Tests-Pytest_Passing-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-kimi-telemetry)
+[![Pytest](https://img.shields.io/badge/Tests-9_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-kimi-telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **Engenharia de Telemetria, Física de Altitude e Otimização de Estratégia de Pit Stop na Fórmula 1.**  
-> Inspirado na vitória histórica de **Kimi Antonelli (#12)** no **Grande Prêmio da Cidade do México (Autódromo Hermanos Rodríguez — 2.240m)**.
+> **Plataforma Global de Engenharia de Corrida, Setup Aerodinâmico/Mecânico das 10 Equipes, Física Barométrica de Altitude e Otimização de Estratégia de Pit Stop para todos os 24 Circuitos do Calendário Mundial da Fórmula 1.**
 
 ---
 
-## 🎯 O Problema Real do Pit-Wall no GP do México
+## 🌍 Funcionalidades Implementadas (Sprint 1 + Sprint 2)
 
-O Autódromo Hermanos Rodríguez (71 voltas, $4{,}304\text{ km}$) apresenta dois desafios físicos e matemáticos únicos no calendário da Fórmula 1:
-1. **Física Atmosférica em Grande Altitude ($h = 2.240\text{ m}$)**: O ar rarefeito reduz a densidade atmosférica ($\rho$) em **$\approx 23{,}8\%$** em relação ao nível do mar, diminuindo drasticamente tanto o arrasto aerodinâmico ($F_d$) quanto o *downforce* ($F_L$) e a capacidade de refrigeração dos freios e da unidade de potência.
-2. **Trade-off Não-Linear entre Queima de Combustível e *Cliff* Térmico dos Pneus**: A cada volta o carro fica $\approx 1{,}5\text{ kg}$ mais leve (ganhando $\approx 0{,}055\text{ s/volta}$), mas o desgaste térmico do composto (Soft, Medium, Hard) sofre uma transição quadrática abrupta após a volta limite (*tire cliff*), abrindo a janela matemática para o **Undercut**.
+1. **Catálogo Mundial dos 24 Circuitos (`data/circuits_catalog.json`) + Detecção Automática do Próximo GP (`get_next_upcoming_gp`)**:
+   - Cobertura completa das 24 etapas do campeonato mundial (Bahrain, Jeddah, Melbourne, Suzuka, Shanghai, Miami, Imola, Mônaco, Barcelona, Montreal, Spielberg, Silverstone, Spa-Francorchamps, Hungaroring, Zandvoort, Monza, Baku, Singapura, Austin, Cidade do México, **Interlagos / São Paulo**, Las Vegas, Qatar e Abu Dhabi).
+   - Cada pista possui coordenadas GPS `(lat, lon)` integradas à API meteorológica **`Open-Meteo`** ao vivo no navegador, altitude barométrica real ($h$), alocação real de compostos Pirelli (`C1` a `C5`), fator de abrasividade do asfalto, perda de tempo no Pit Lane ($t_{\text{pit\_loss}}$) e probabilidade histórica de *Safety Car*.
+2. **Catálogo das 10 Equipes & 20 Pilotos (`data/teams_catalog.json`) + Simulador Físico de Setup (`evaluate_car_setup_physics`)**:
+   - Escolha qualquer uma das **10 equipes do grid** (**McLaren MCL39**, **Ferrari SF-25**, **Red Bull RB21**, **Mercedes W16**, **Aston Martin AMR25**, **Williams FW47**, **Racing Bulls VCARB 02**, **Haas VF-25**, **Alpine A525** e **Sauber/Audi C45**) e qualquer um dos 20 pilotos.
+   - Ajuste o **Ângulo de Asa (*Downforce Level* 1–50)**, **Altura do Assoalho (*Ride Height* em mm)** e **Modo de Bateria (ERS Deployment)** para observar o *trade-off* físico imediato entre velocidade máxima de reta com DRS, velocidade de contorno de curva (*apex speed*) e escorregamento térmico dos pneus.
+3. **Otimizador de Janela de Pit Stop e Ganho de *Undercut* (`find_optimal_one_stop_window`)**:
+   - Simula volta a volta o efeito cruzado da queima de combustível com o *cliff* térmico quadrático dos compostos (`SOFT`, `MEDIUM`, `HARD`) e recomenda a volta exata de parada.
 
 ---
 
-## 📐 Fundamentação Matemática & Física Implementada (`src/strategy_engine.py`)
+## 📐 Fundamentação Matemática & Física (`src/strategy_engine.py`)
 
-### 1. Densidade Barométrica Internacional (ISA) e Redução Aerodinâmica
+### 1. Densidade Barométrica Internacional (ISA) e Redução Aerodinâmica por Altitude
 
 $$\rho(h, T) = \rho_0 \left( 1 - \frac{L \cdot h}{T_0} \right)^{\frac{g}{R \cdot L}} \cdot \frac{T_0}{T}$$
 
-Como as forças de arrasto e *downforce* escalam linearmente com a densidade do fluido ($F = \frac{1}{2} \rho v^2 C_L A$), a $2.240\text{ m}$ e $24^\circ\text{C}$ obtemos $\rho \approx 0{,}933\text{ kg/m}^3$ vs. $\rho_0 = 1{,}225\text{ kg/m}^3$ ao nível do mar (**$-23{,}8\%$ de pressão aerodinâmica**).
+Como as forças de arrasto e *downforce* escalam linearmente com a densidade do fluido ($F = \frac{1}{2} \rho v^2 C_L A$), a plataforma recalcula automaticamente a perda aerodinâmica de cada autódromo — ex.: **Cidade do México** ($2.240\text{ m} \implies -23{,}8\%$ ar), **Interlagos** ($765\text{ m} \implies -8{,}5\%$ ar) e **Spa-Francorchamps** ($410\text{ m} \implies -4{,}8\%$ ar).
 
-### 2. Modelo de Tempo de Volta com *Cliff* Térmico Não-Linear
+### 2. Física de Setup do Carro (Asa, Altura do Assoalho & ERS) e Ritmo de Volta
 
-$$T(\ell, c, a) = T_{\text{base}} + \Delta_c + \gamma_{\text{fuel}}(L_{\text{total}} - \ell) + \theta(T_{\text{track}}) \cdot \left[ \alpha_c \cdot a + \beta_c \cdot \max(0, \, a - a_{\text{cliff}, c})^2 \right]$$
+$$T(\ell, c, a) = T_{\text{base, pista}} + \Delta_{\text{equipe, setup}} + \Delta_c + \gamma_{\text{fuel}}(L_{\text{total}} - \ell) + \theta(T_{\text{track}}, \text{setup}) \cdot \left[ \alpha_c \cdot a + \beta_c \cdot \max(0, \, a - a_{\text{cliff}, c})^2 \right]$$
 
-Onde:
-- $\ell \in \{1, \dots, 71\}$ é a volta da corrida e $a$ é a idade do pneu no *stint* atual;
-- $\gamma_{\text{fuel}} = 0{,}055\text{ s/volta}$ modela o ganho de tempo pela redução de massa de combustível;
-- $\alpha_c$ e $\beta_c$ são as taxas de degradação linear e quadrática pós-*cliff* ($a_{\text{cliff}}$) de cada composto (`SOFT`, `MEDIUM`, `HARD`).
+Onde o desvio em relação ao ângulo ótimo de asa da pista ($\Delta w = w - w_{\text{opt}}$) afeta simultaneamente a velocidade final de reta com DRS, o tempo de contorno de curva e o fator de escorregamento térmico do pneu.
 
-### 3. Otimização da Janela de Pit Stop e Ganho de *Undercut*
+---
 
-$$\ell_{\text{pit}}^* = \arg\min_{\ell_{\text{pit}} \in [15, 55]} \left( \sum_{\ell=1}^{\ell_{\text{pit}}} T(\ell, c_1, \ell) + t_{\text{pit\_loss}} + \sum_{\ell=\ell_{\text{pit}}+1}^{L_{\text{total}}} T(\ell, c_2, \ell - \ell_{\text{pit}}) \right)$$
+## 🗺️ Roadmap de Evolução (Próximas Sprints)
+
+- **[Roadmap — Sprint 3]** Simulador estocástico de corrida por Monte Carlo ($N = 1.000$ corridas) sorteando janelas de *Safety Car* / *VSC* e *crossover* de pneu de chuva (*Intermediate* / *Wet*).
+- **[Roadmap — Sprint 4]** Pipeline de ingestão de telemetria real de 240Hz via biblioteca `FastF1` / `OpenF1` + Agente Engenheiro de Box por voz/chat utilizando *Gemini Tool Calling*.
 
 ---
 
 ## 🚀 Como Executar
 
-### 1. Simulador Interativo (Zero Instalação)
+### 1. Plataforma Web Interativa (Zero Instalação)
 Abra `index.html` diretamente no navegador ou acesse o [**Live Demo no GitHub Pages**](https://geovana28.github.io/f1-kimi-telemetry/).
 
 ### 2. Executar a Suíte Automatizada de Testes (`pytest`)
 ```bash
 pytest tests/ -v
 ```
-
----
-
-## ⚠️ Hipóteses e Limitações Metodológicas
-
-1. **Pista Livre (*Clean Air*)**: O otimizador determinístico calcula o ritmo em pista livre, abstraindo perda de tempo em tráfego (*dirty air* / trem de DRS) e intervenções estocásticas de *Safety Car* ou *Virtual Safety Car (VSC)*.
-2. **Parâmetros Calibrados**: Os coeficientes $\alpha_c, \beta_c$ e $t_{\text{pit\_loss}} = 21{,}8\text{ s}$ representam valores médios de referência do circuito da Cidade do México.
 
 ---
 
