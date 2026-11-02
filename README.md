@@ -1,28 +1,33 @@
-# 🏎️ F1 Global Pit-Wall Telemetry, Car Setup & Race Strategy AI (24 Circuits • 10 Teams)
+# 🏎️ F1 Global Pit-Wall Intelligence & Strategy AI (`f1-pitwall-ai`)
 
-[![Live Interactive Pit-Wall](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-kimi-telemetry/)
+[![Live Interactive Pit-Wall](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-pitwall-ai/)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Pytest](https://img.shields.io/badge/Tests-9_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-kimi-telemetry)
+[![Pytest](https://img.shields.io/badge/Tests-13_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-pitwall-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **Plataforma Global de Engenharia de Corrida, Setup Aerodinâmico/Mecânico das 10 Equipes, Física Barométrica de Altitude e Otimização de Estratégia de Pit Stop para todos os 24 Circuitos do Calendário Mundial da Fórmula 1.**
+> **Plataforma Global de Engenharia de Corrida, Física Veicular das 10 Equipes, Simulação Estocástica de Monte Carlo (*Safety Car* & Chuva), Telemetria de Volta e Agente Engenheiro de Box com Tool Calling para todos os 24 Circuitos do Calendário Mundial da Fórmula 1.**
 
 ---
 
-## 🌍 Funcionalidades Implementadas (Sprint 1 + Sprint 2)
+## 🌍 Arquitetura Completa Implementada (5 Módulos)
 
 1. **Catálogo Mundial dos 24 Circuitos (`data/circuits_catalog.json`) + Detecção Automática do Próximo GP (`get_next_upcoming_gp`)**:
-   - Cobertura completa das 24 etapas do campeonato mundial (Bahrain, Jeddah, Melbourne, Suzuka, Shanghai, Miami, Imola, Mônaco, Barcelona, Montreal, Spielberg, Silverstone, Spa-Francorchamps, Hungaroring, Zandvoort, Monza, Baku, Singapura, Austin, Cidade do México, **Interlagos / São Paulo**, Las Vegas, Qatar e Abu Dhabi).
-   - Cada pista possui coordenadas GPS `(lat, lon)` integradas à API meteorológica **`Open-Meteo`** ao vivo no navegador, altitude barométrica real ($h$), alocação real de compostos Pirelli (`C1` a `C5`), fator de abrasividade do asfalto, perda de tempo no Pit Lane ($t_{\text{pit\_loss}}$) e probabilidade histórica de *Safety Car*.
+   - Cobertura integral das 24 etapas do campeonato mundial (Bahrain, Jeddah, Melbourne, Suzuka, Shanghai, Miami, Imola, Mônaco, Barcelona, Montreal, Spielberg, Silverstone, Spa-Francorchamps, Hungaroring, Zandvoort, Monza, Baku, Singapura, Austin, Cidade do México, **Interlagos / São Paulo**, Las Vegas, Qatar e Abu Dhabi).
+   - Integração em tempo real com a API meteorológica **`Open-Meteo`** nas coordenadas GPS `(lat, lon)` de cada autódromo, altitude barométrica real ($h$), alocação oficial de compostos Pirelli (`C1` a `C5`), abrasividade do asfalto, *pit lane time loss* e probabilidade histórica de *Safety Car*.
 2. **Catálogo das 10 Equipes & 20 Pilotos (`data/teams_catalog.json`) + Simulador Físico de Setup (`evaluate_car_setup_physics`)**:
    - Escolha qualquer uma das **10 equipes do grid** (**McLaren MCL39**, **Ferrari SF-25**, **Red Bull RB21**, **Mercedes W16**, **Aston Martin AMR25**, **Williams FW47**, **Racing Bulls VCARB 02**, **Haas VF-25**, **Alpine A525** e **Sauber/Audi C45**) e qualquer um dos 20 pilotos.
-   - Ajuste o **Ângulo de Asa (*Downforce Level* 1–50)**, **Altura do Assoalho (*Ride Height* em mm)** e **Modo de Bateria (ERS Deployment)** para observar o *trade-off* físico imediato entre velocidade máxima de reta com DRS, velocidade de contorno de curva (*apex speed*) e escorregamento térmico dos pneus.
-3. **Otimizador de Janela de Pit Stop e Ganho de *Undercut* (`find_optimal_one_stop_window`)**:
-   - Simula volta a volta o efeito cruzado da queima de combustível com o *cliff* térmico quadrático dos compostos (`SOFT`, `MEDIUM`, `HARD`) e recomenda a volta exata de parada.
+   - Ajuste o **Ângulo de Asa (*Downforce Level* 1–50)**, **Altura do Assoalho (*Ride Height* em mm)** e **Modo de Bateria (ERS Deployment)** para simular o *trade-off* entre Velocidade Máxima na Reta com DRS ($\text{km/h}$), velocidade de contorno de curva (*apex speed*) e degradação térmica dos pneus.
+3. **Simulador Estocástico de Corrida por Monte Carlo & Crossover de Chuva (`src/monte_carlo_race.py`)**:
+   - **`run_monte_carlo_strategy_comparison`**: Roda centenas de corridas estocásticas comparando `1-Stop (Medium → Hard)`, `1-Stop (Soft → Hard)` e `2-Stop (Soft → Medium → Medium)`, sorteando intervenções de *Safety Car* (que reduzem o *pit loss* em $\approx 42\%$ se coincidirem com a janela de parada) e variância log-normal de *pit stop*.
+   - **`compute_wet_crossover_curve`**: Modela o tempo de volta em função da lâmina d'água na pista ($0{,}0\text{ mm}$ a $4{,}5\text{ mm}$) e determina os pontos exatos de *Crossover* para trocar do pneu *Slick* para o **Intermediate (Verde — $0{,}75\text{ mm}$)** e **Full Wet (Azul — $2{,}50\text{ mm}$)**.
+4. **Comparador de Telemetria de Volta (`src/telemetry_loader.py`)**:
+   - Gera e sobrepõe os canais de velocidade instantânea ($\text{km/h}$), pedal do acelerador ($0\text{–}100\%$), zonas de frenagem e ativação de DRS ao longo dos metros da pista entre duas equipes rivais.
+5. **Agente Engenheiro de Corrida com Tool Calling & Guardrails (`src/race_engineer_agent.py`)**:
+   - Roteador de ferramentas matemáticas (`compute_pit_window_and_undercut`, `simulate_safety_car_monte_carlo`, `evaluate_rain_crossover`, `compare_car_setup_and_telemetry` e `out_of_scope_guardrail`) que responde no rádio do Pit-Wall fundamentado nos números exatos da simulação.
 
 ---
 
-## 📐 Fundamentação Matemática & Física (`src/strategy_engine.py`)
+## 📐 Fundamentação Matemática & Física
 
 ### 1. Densidade Barométrica Internacional (ISA) e Redução Aerodinâmica por Altitude
 
@@ -34,21 +39,12 @@ Como as forças de arrasto e *downforce* escalam linearmente com a densidade do 
 
 $$T(\ell, c, a) = T_{\text{base, pista}} + \Delta_{\text{equipe, setup}} + \Delta_c + \gamma_{\text{fuel}}(L_{\text{total}} - \ell) + \theta(T_{\text{track}}, \text{setup}) \cdot \left[ \alpha_c \cdot a + \beta_c \cdot \max(0, \, a - a_{\text{cliff}, c})^2 \right]$$
 
-Onde o desvio em relação ao ângulo ótimo de asa da pista ($\Delta w = w - w_{\text{opt}}$) afeta simultaneamente a velocidade final de reta com DRS, o tempo de contorno de curva e o fator de escorregamento térmico do pneu.
-
----
-
-## 🗺️ Roadmap de Evolução (Próximas Sprints)
-
-- **[Roadmap — Sprint 3]** Simulador estocástico de corrida por Monte Carlo ($N = 1.000$ corridas) sorteando janelas de *Safety Car* / *VSC* e *crossover* de pneu de chuva (*Intermediate* / *Wet*).
-- **[Roadmap — Sprint 4]** Pipeline de ingestão de telemetria real de 240Hz via biblioteca `FastF1` / `OpenF1` + Agente Engenheiro de Box por voz/chat utilizando *Gemini Tool Calling*.
-
 ---
 
 ## 🚀 Como Executar
 
 ### 1. Plataforma Web Interativa (Zero Instalação)
-Abra `index.html` diretamente no navegador ou acesse o [**Live Demo no GitHub Pages**](https://geovana28.github.io/f1-kimi-telemetry/).
+Abra `index.html` diretamente no navegador ou acesse o [**Live Demo no GitHub Pages**](https://geovana28.github.io/f1-pitwall-ai/).
 
 ### 2. Executar a Suíte Automatizada de Testes (`pytest`)
 ```bash

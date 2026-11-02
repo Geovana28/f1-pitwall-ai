@@ -1,6 +1,6 @@
 """
 Unit tests for F1 Global Pit-Wall Telemetry, 24-Circuit Catalog, 10-Team Car Setup Physics,
-Barometric Altitude Aerodynamics, Tire Degradation & Pit Strategy Engine.
+Monte Carlo Safety Car & Wet Crossover Simulation, Lap Telemetry Traces, and Race Engineer AI Agent.
 """
 
 import pytest
@@ -16,6 +16,12 @@ from src.strategy_engine import (
     simulate_race_strategy,
     find_optimal_one_stop_window,
 )
+from src.monte_carlo_race import (
+    compute_wet_crossover_curve,
+    run_monte_carlo_strategy_comparison,
+)
+from src.telemetry_loader import generate_lap_telemetry_comparison
+from src.race_engineer_agent import ask_race_engineer
 
 
 def test_global_24_circuits_catalog_integrity():
@@ -84,3 +90,41 @@ def test_invalid_stint_laps_sum_raises():
     """Strategy whose stints do not sum to total_laps must raise ValueError."""
     with pytest.raises(ValueError):
         simulate_race_strategy([("SOFT", 20), ("HARD", 30)], total_laps=71)
+
+
+def test_wet_tire_crossover_curve():
+    """Wet crossover model must identify water depth where Intermediate beats Slick and Wet beats Intermediate."""
+    cross = compute_wet_crossover_curve("interlagos", "MEDIUM")
+    assert 0.25 <= cross["slick_to_inter_crossover_mm"] <= 1.50
+    assert cross["inter_to_wet_crossover_mm"] > cross["slick_to_inter_crossover_mm"]
+    assert cross["slick_lap_sec"][0] < cross["intermediate_lap_sec"][0]
+    assert cross["full_wet_lap_sec"][-1] < cross["slick_lap_sec"][-1]
+
+
+def test_monte_carlo_safety_car_simulation():
+    """Monte Carlo strategy comparison must return probabilities summing to ~100% across the 3 candidate strategies."""
+    mc = run_monte_carlo_strategy_comparison("interlagos", "mclaren", wing_level=34, n_simulations=200, seed=7)
+    assert len(mc["strategies_ranking"]) == 3
+    total_prob = sum(s["win_probability_pct"] for s in mc["strategies_ranking"])
+    assert 99.0 <= total_prob <= 101.0
+
+
+def test_telemetry_trace_generator():
+    """Lap telemetry generator must produce aligned arrays of distance, speed, throttle, brake and DRS zones."""
+    tel = generate_lap_telemetry_comparison("spa", "red_bull", 23, "mercedes", 35, n_points=50)
+    assert len(tel["distance_m"]) == 50
+    assert len(tel["speed_a_kmh"]) == 50
+    assert max(tel["speed_a_kmh"]) > max(tel["speed_b_kmh"])  # lower wing on Spa straight is faster
+
+
+def test_race_engineer_agent_tool_routing_and_guardrail():
+    """Race Engineer AI must route rain, Monte Carlo, and pit window queries to the right tools and block off-topic prompts."""
+    r_rain = ask_race_engineer("Vai começar a chover na volta 40 em Interlagos, quando colocamos Intermediates?", "interlagos", "mercedes")
+    assert r_rain["selected_tool"] == "evaluate_rain_crossover"
+
+    r_mc = ask_race_engineer("Qual a probabilidade no Monte Carlo com Safety Car para 1-stop vs 2-stop?", "singapore", "ferrari")
+    assert r_mc["selected_tool"] == "simulate_safety_car_monte_carlo"
+
+    r_guard = ask_race_engineer("Me passe uma receita de bolo de cenoura com chocolate", "interlagos", "mercedes")
+    assert r_guard["selected_tool"] == "out_of_scope_guardrail"
+    assert r_guard["tool_output"]["blocked"] is True
