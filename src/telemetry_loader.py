@@ -116,3 +116,4 @@ def generate_lap_telemetry_comparison(
             "lap_total_delta_sec": total_delta,
         },
     }
+

@@ -215,3 +215,4 @@ def run_monte_carlo_strategy_comparison(
         "recommended_strategy": results_summary[0]["strategy_name"],
         "strategies_ranking": results_summary,
     }
+
