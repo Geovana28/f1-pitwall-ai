@@ -5,7 +5,16 @@
 [![Pytest](https://img.shields.io/badge/Tests-13_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-pitwall-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
+> **🇧🇷 Idioma**: Português (Brasil) | **🇺🇸 [English Executive Summary](#-english-executive-summary)**
+>
 > **Plataforma Global de Engenharia de Corrida, Física Veicular das 10 Equipes, Simulação Estocástica de Monte Carlo (*Safety Car* & Chuva), Telemetria de Volta e Agente Engenheiro de Box com Tool Calling para todos os 24 Circuitos do Calendário Mundial da Fórmula 1.**
+
+---
+
+### 🌐 English Executive Summary
+**F1 Pit-Wall AI** is a global motorsport race engineering, vehicle dynamics, and strategy platform designed and built by **Geovana Luiza Morais Moreira**. It covers all 24 FIA World Championship circuits and all 10 F1 constructors. Core capabilities include: ISA atmospheric density reduction by track altitude, aero setup trade-offs (wing level, ride height, ERS deployment), Monte Carlo strategy simulations under stochastic Safety Car deployments, tire degradation curves with rain crossover physics (Slick / Intermediate / Wet), and a pit-wall Race Engineer Agent powered by tool calling and domain guardrails.
+
+---
 
 ---
 
