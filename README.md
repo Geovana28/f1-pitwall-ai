@@ -1,6 +1,7 @@
 # 🏎️ F1 Global Pit-Wall Intelligence, ML & Strategy AI (`f1-pitwall-ai`)
 
-[![Live Interactive Pit-Wall](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-pitwall-ai/)
+[![Live ML & LangGraph App](https://img.shields.io/badge/Live_App-Streamlit_Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://f1-pitwall-ai.streamlit.app/)
+[![Live Interactive Pit-Wall](https://img.shields.io/badge/Web_Telemetry-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-pitwall-ai/)
 [![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph%20StateGraph-orange?style=for-the-badge&logo=langchain)](https://github.com/langchain-ai/langgraph)
 [![MCP](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol%20(v1.0)-purple?style=for-the-badge)](https://modelcontextprotocol.io)
 [![Machine Learning](https://img.shields.io/badge/ML%20Model-Gradient%20Boosting%20(92.07%25%20Acc)-brightgreen?style=for-the-badge)](https://scikit-learn.org)

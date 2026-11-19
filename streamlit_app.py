@@ -83,32 +83,128 @@ track_temp = st.sidebar.slider("Track Temperature (°C)", 15, 58, int(circuit.ge
 st.markdown(
     f"""
     <style>
-    .stApp {{ background-color: #0b0b0d; color: #f4f4f6; }}
-    section[data-testid="stSidebar"] {{ background-color: #121215; border-right: 1px solid #242429; }}
-    div[data-testid="stMetric"] {{
-        background-color: #121215;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    html, body, [class*="css"] {{
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }}
+    .stApp {{
+        background-color: #0b0b0d !important;
+        color: #f4f4f6 !important;
+    }}
+    header[data-testid="stHeader"] {{
+        background-color: #0b0b0d !important;
+        border-bottom: 1px solid #18181c;
+    }}
+    section[data-testid="stSidebar"] {{
+        background-color: #121215 !important;
+        border-right: 1px solid #242429;
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: #e4e4e7;
+    }}
+    section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p {{
+        color: #a1a1aa !important;
+        font-size: 0.82rem;
+    }}
+    section[data-testid="stSidebar"] h3 {{
+        color: #f4f4f6 !important;
+        font-size: 0.82rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }}
+    /* Dark inputs & selectboxes */
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="input"] > div {{
+        background-color: #0b0b0d !important;
+        border-color: #323238 !important;
+        color: #f4f4f6 !important;
+        border-radius: 4px !important;
+    }}
+    /* Dark preset buttons */
+    .stButton > button {{
+        background-color: #121215 !important;
+        color: #d4d4d8 !important;
+        border: 1px solid #323238 !important;
+        border-radius: 4px !important;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        padding: 0.45rem 0.75rem !important;
+    }}
+    .stButton > button:hover {{
+        background-color: #18181c !important;
+        border-color: {team_color} !important;
+        color: #f4f4f6 !important;
+    }}
+    /* Dynamic constructor accent on tabs */
+    button[data-baseweb="tab"] {{
+        color: #71717a !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.8rem !important;
+    }}
+    button[data-baseweb="tab"][aria-selected="true"] {{
+        color: {team_color} !important;
+    }}
+    div[data-baseweb="tab-highlight"] {{
+        background-color: {team_color} !important;
+    }}
+    /* Unified Monochrome KPI Strip (Zero truncation, zero arrows) */
+    .kpi-strip {{
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        background: #121215;
         border: 1px solid #242429;
         border-radius: 6px;
-        padding: 14px 16px;
+        margin-bottom: 22px;
+        overflow: hidden;
+    }}
+    @media (max-width: 900px) {{
+        .kpi-strip {{ grid-template-columns: repeat(2, 1fr); }}
+    }}
+    .kpi-cell {{
+        padding: 15px 18px;
+        border-right: 1px solid #242429;
+    }}
+    .kpi-cell:last-child {{ border-right: none; }}
+    .kpi-lbl {{
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #71717a;
+        font-weight: 500;
+    }}
+    .kpi-num {{
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #f4f4f6;
+        margin: 5px 0 3px 0;
+        white-space: nowrap;
+    }}
+    .kpi-num.accent {{ color: {team_color}; }}
+    .kpi-meta {{
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.71rem;
+        color: #a1a1aa;
     }}
     .radio-panel {{
         background-color: #121215;
         border: 1px solid {team_color};
         border-radius: 6px;
         padding: 18px 20px;
-        font-family: monospace;
-        font-size: 0.88rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.84rem;
         line-height: 1.6;
         color: #f4f4f6;
-        margin-top: 12px;
+        margin: 14px 0 18px 0;
     }}
     .trace-step {{
         background-color: #121215;
         border: 1px solid #242429;
         border-radius: 4px;
         padding: 10px 14px;
-        font-family: monospace;
-        font-size: 0.78rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.77rem;
         margin-bottom: 6px;
         color: #d4d4d8;
     }}
@@ -157,13 +253,39 @@ ml_pred = predict_podium_ml(
 )
 podium_pct = round(ml_pred["podium_probability"] * 100.0, 1)
 
-# --- TOP KPI STRIP ---
-k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("ML Podium Probability", f"{podium_pct}%", delta=f"Grid P{grid_position}", delta_color="off")
-k2.metric("Out-of-Time ROC-AUC", "0.949", delta="92.07% Acc (2025)", delta_color="off")
-k3.metric("Vmax Speed Trap (DRS)", f"{setup_res['top_speed_drs_kmh']:.1f} km/h")
-k4.metric("ISA Air Density Delta", f"-{aero_res['drag_and_downforce_reduction_pct']:.1f}%", delta=f"Alt {circuit['altitude_m']}m", delta_color="off")
-k5.metric("Historical SC Prob", f"{round(circuit['safety_car_prob']*100)}%")
+# --- TOP UNIFIED KPI STRIP ---
+st.markdown(
+    f"""
+    <div class="kpi-strip">
+        <div class="kpi-cell">
+            <div class="kpi-lbl">ML Podium Probability</div>
+            <div class="kpi-num accent">{podium_pct}%</div>
+            <div class="kpi-meta">Grid P{grid_position} • {weather_cond}</div>
+        </div>
+        <div class="kpi-cell">
+            <div class="kpi-lbl">Out-of-Time ROC-AUC</div>
+            <div class="kpi-num">0.949</div>
+            <div class="kpi-meta">92.07% Acc (2025 Test)</div>
+        </div>
+        <div class="kpi-cell">
+            <div class="kpi-lbl">Vmax Speed Trap (DRS)</div>
+            <div class="kpi-num">{setup_res['top_speed_drs_kmh']:.1f} km/h</div>
+            <div class="kpi-meta">Apex: {setup_res['cornering_apex_kmh']:.1f} km/h</div>
+        </div>
+        <div class="kpi-cell">
+            <div class="kpi-lbl">ISA Air Density Delta</div>
+            <div class="kpi-num">-{aero_res['drag_and_downforce_reduction_pct']:.1f}%</div>
+            <div class="kpi-meta">Altitude: {circuit['altitude_m']} m</div>
+        </div>
+        <div class="kpi-cell">
+            <div class="kpi-lbl">Historical SC Prob</div>
+            <div class="kpi-num">{round(circuit['safety_car_prob']*100)}%</div>
+            <div class="kpi-meta">Pit Loss: {circuit['pit_loss_sec']} s</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # --- 3 ARCHITECTURAL TABS ---
 tab_agent, tab_ml, tab_phys = st.tabs([
