@@ -13,19 +13,74 @@ import numpy as np
 BASE_DIR = Path(__file__).parent.parent
 CIRCUITS_PATH = BASE_DIR / "data" / "circuits_catalog.json"
 MODEL_PATH = BASE_DIR / "ml_pipeline" / "f1_podium_predictor_model.joblib"
+DATASET_PATH = BASE_DIR / "ml_pipeline" / "f1_real_races_2022_2025.csv"
 
 CIRCUITS_DATA = {}
 if CIRCUITS_PATH.exists():
     with open(CIRCUITS_PATH, "r", encoding="utf-8") as f:
         CIRCUITS_DATA = json.load(f)
 
+
+def _load_or_retrain_ml_pipeline():
+    """Loads persisted GradientBoosting pipeline or safely retrains from 2022-2025 FIA CSV if pickle version mismatches."""
+    import pandas as pd
+
+    if MODEL_PATH.exists():
+        try:
+            pipe = joblib.load(MODEL_PATH)
+            # Smoke test inference to guarantee sklearn cross-version compatibility
+            sample = pd.DataFrame([{
+                "grid_position": 2, "is_front_row": 1, "is_pole_position": 0,
+                "team_season_point_share": 0.24, "qualifying_deficit": 1.0,
+                "fastest_lap_rank": 2, "avg_speed_kmh": 218.4,
+                "team_name": "Mercedes", "circuit_id": "interlagos"
+            }])
+            _ = pipe.predict_proba(sample)
+            return pipe
+        except Exception as e:
+            print(f"[Info] Retraining ML model for current environment ({e})")
+
+    if DATASET_PATH.exists():
+        try:
+            from sklearn.compose import ColumnTransformer
+            from sklearn.ensemble import GradientBoostingClassifier
+            from sklearn.pipeline import Pipeline
+            from sklearn.preprocessing import OneHotEncoder
+
+            df = pd.read_csv(DATASET_PATH)
+            df["avg_speed_kmh"] = df["avg_speed_kmh"].fillna(df["avg_speed_kmh"].median())
+            df["fastest_lap_rank"] = df["fastest_lap_rank"].fillna(20)
+            df["is_front_row"] = df["grid_position"].apply(lambda g: 1 if 1 <= g <= 4 else 0)
+            df["is_pole_position"] = df["grid_position"].apply(lambda g: 1 if g == 1 else 0)
+            team_pts = df.groupby(["season", "team_name"])["points"].transform("sum")
+            season_pts = df.groupby(["season"])["points"].transform("sum")
+            df["team_season_point_share"] = (team_pts / season_pts).round(4)
+            df["qualifying_deficit"] = df["grid_position"] - 1.0
+
+            num_cols = ["grid_position", "is_front_row", "is_pole_position", "team_season_point_share", "qualifying_deficit", "fastest_lap_rank", "avg_speed_kmh"]
+            cat_cols = ["team_name", "circuit_id"]
+            train_df = df[df["season"] < 2025]
+            X_train = train_df[num_cols + cat_cols]
+            y_train = train_df["is_podium"]
+
+            preprocessor = ColumnTransformer([
+                ("num", "passthrough", num_cols),
+                ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_cols),
+            ])
+            pipe = Pipeline([
+                ("preprocessor", preprocessor),
+                ("classifier", GradientBoostingClassifier(learning_rate=0.08, max_depth=4, n_estimators=120, random_state=42)),
+            ])
+            pipe.fit(X_train, y_train)
+            return pipe
+        except Exception as e:
+            print(f"[Warning] Could not retrain ML model: {e}")
+
+    return None
+
+
 # Load Scikit-Learn Trained Model
-ML_BUNDLE = None
-if MODEL_PATH.exists():
-    try:
-        ML_BUNDLE = joblib.load(MODEL_PATH)
-    except Exception as e:
-        print(f"[Warning] Could not load ML model: {e}")
+ML_BUNDLE = _load_or_retrain_ml_pipeline()
 
 
 def get_live_telemetry(driver: str, circuit: str) -> Dict[str, Any]:
