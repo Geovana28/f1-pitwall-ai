@@ -17,7 +17,7 @@
       --text-secondary: #a1a1aa;
       --text-muted: #71717a;
       --accent: #e4e4e7;
-      --focus: #00a19b;
+      --team-accent: #00d2be;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -212,7 +212,7 @@
     }
     .control-group label span.val-tag {
       font-family: 'JetBrains Mono', monospace;
-      color: var(--text-primary);
+      color: var(--team-accent);
       font-size: 0.76rem;
     }
 
@@ -230,7 +230,7 @@
       transition: border-color 0.15s ease;
     }
     select:focus, input[type="text"]:focus {
-      border-color: var(--text-secondary);
+      border-color: var(--team-accent);
     }
 
     input[type="range"] {
@@ -249,9 +249,9 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: var(--text-primary);
+      background: var(--team-accent);
       cursor: pointer;
-      border: 1px solid var(--bg);
+      border: 2px solid var(--bg);
     }
 
     .specs-box {
@@ -640,16 +640,16 @@
     ];
 
     const TEAMS = [
-      { id: "mclaren", name: "McLaren Formula 1 Team", chassis: "MCL39", pu: "Mercedes M16", drivers: ["#4 Lando Norris", "#81 Oscar Piastri"], offset: -0.04, aero: 0.97, drs: 21.0, pu_rating: 0.96, deg_mult: 0.92, pit_sec: 2.18 },
-      { id: "ferrari", name: "Scuderia Ferrari HP", chassis: "SF-25", pu: "Ferrari 066/14", drivers: ["#16 Charles Leclerc", "#44 Lewis Hamilton"], offset: -0.02, aero: 0.95, drs: 22.4, pu_rating: 0.97, deg_mult: 0.95, pit_sec: 2.24 },
-      { id: "red_bull", name: "Oracle Red Bull Racing", chassis: "RB21", pu: "Honda RBPT", drivers: ["#1 Max Verstappen", "#30 Liam Lawson"], offset: -0.01, aero: 0.96, drs: 23.2, pu_rating: 0.95, deg_mult: 0.96, pit_sec: 2.09 },
-      { id: "mercedes", name: "Mercedes-AMG PETRONAS", chassis: "W16", pu: "Mercedes M16", drivers: ["#12 Kimi Antonelli", "#63 George Russell"], offset: 0.00, aero: 0.94, drs: 21.5, pu_rating: 0.96, deg_mult: 0.97, pit_sec: 2.35 },
-      { id: "aston_martin", name: "Aston Martin Aramco", chassis: "AMR25", pu: "Mercedes M16", drivers: ["#14 Fernando Alonso", "#18 Lance Stroll"], offset: 0.38, aero: 0.89, drs: 20.4, pu_rating: 0.95, deg_mult: 1.03, pit_sec: 2.52 },
-      { id: "williams", name: "Atlassian Williams Racing", chassis: "FW47", pu: "Mercedes M16", drivers: ["#23 Alexander Albon", "#55 Carlos Sainz"], offset: 0.42, aero: 0.91, drs: 23.5, pu_rating: 0.96, deg_mult: 1.02, pit_sec: 2.48 },
-      { id: "racing_bulls", name: "Visa Cash App Racing Bulls", chassis: "VCARB 02", pu: "Honda RBPT", drivers: ["#22 Yuki Tsunoda", "#6 Isack Hadjar"], offset: 0.46, aero: 0.89, drs: 21.6, pu_rating: 0.94, deg_mult: 1.02, pit_sec: 2.45 },
-      { id: "haas", name: "MoneyGram Haas F1 Team", chassis: "VF-26", pu: "Ferrari 066/14", drivers: ["#88 Rafael Câmara", "#87 Oliver Bearman"], offset: 0.49, aero: 0.88, drs: 21.8, pu_rating: 0.96, deg_mult: 1.05, pit_sec: 2.65 },
-      { id: "alpine", name: "BWT Alpine F1 Team", chassis: "A525", pu: "Renault E-Tech", drivers: ["#10 Pierre Gasly", "#7 Jack Doohan"], offset: 0.54, aero: 0.88, drs: 20.8, pu_rating: 0.89, deg_mult: 1.04, pit_sec: 2.58 },
-      { id: "sauber", name: "Stake F1 Team Kick Sauber (Audi)", chassis: "C45", pu: "Ferrari 066/14", drivers: ["#5 Gabriel Bortoleto", "#27 Nico Hülkenberg"], offset: 0.62, aero: 0.86, drs: 20.5, pu_rating: 0.95, deg_mult: 1.06, pit_sec: 2.72 }
+      { id: "mclaren", name: "McLaren Formula 1 Team", chassis: "MCL39", pu: "Mercedes M16", color: "#ff8000", drivers: ["#4 Lando Norris", "#81 Oscar Piastri"], offset: -0.04, aero: 0.97, drs: 21.0, pu_rating: 0.96, deg_mult: 0.92, pit_sec: 2.18 },
+      { id: "ferrari", name: "Scuderia Ferrari HP", chassis: "SF-25", pu: "Ferrari 066/14", color: "#ef4444", drivers: ["#16 Charles Leclerc", "#44 Lewis Hamilton"], offset: -0.02, aero: 0.95, drs: 22.4, pu_rating: 0.97, deg_mult: 0.95, pit_sec: 2.24 },
+      { id: "red_bull", name: "Oracle Red Bull Racing", chassis: "RB21", pu: "Honda RBPT", color: "#3b82f6", drivers: ["#1 Max Verstappen", "#30 Liam Lawson"], offset: -0.01, aero: 0.96, drs: 23.2, pu_rating: 0.95, deg_mult: 0.96, pit_sec: 2.09 },
+      { id: "mercedes", name: "Mercedes-AMG PETRONAS", chassis: "W16", pu: "Mercedes M16", color: "#00d2be", drivers: ["#12 Kimi Antonelli", "#63 George Russell"], offset: 0.00, aero: 0.94, drs: 21.5, pu_rating: 0.96, deg_mult: 0.97, pit_sec: 2.35 },
+      { id: "aston_martin", name: "Aston Martin Aramco", chassis: "AMR25", pu: "Mercedes M16", color: "#10b981", drivers: ["#14 Fernando Alonso", "#18 Lance Stroll"], offset: 0.38, aero: 0.89, drs: 20.4, pu_rating: 0.95, deg_mult: 1.03, pit_sec: 2.52 },
+      { id: "williams", name: "Atlassian Williams Racing", chassis: "FW47", pu: "Mercedes M16", color: "#38bdf8", drivers: ["#23 Alexander Albon", "#55 Carlos Sainz"], offset: 0.42, aero: 0.91, drs: 23.5, pu_rating: 0.96, deg_mult: 1.02, pit_sec: 2.48 },
+      { id: "racing_bulls", name: "Visa Cash App Racing Bulls", chassis: "VCARB 02", pu: "Honda RBPT", color: "#818cf8", drivers: ["#22 Yuki Tsunoda", "#6 Isack Hadjar"], offset: 0.46, aero: 0.89, drs: 21.6, pu_rating: 0.94, deg_mult: 1.02, pit_sec: 2.45 },
+      { id: "haas", name: "MoneyGram Haas F1 Team", chassis: "VF-26", pu: "Ferrari 066/14", color: "#e4e4e7", drivers: ["#88 Rafael Câmara", "#87 Oliver Bearman"], offset: 0.49, aero: 0.88, drs: 21.8, pu_rating: 0.96, deg_mult: 1.05, pit_sec: 2.65 },
+      { id: "alpine", name: "BWT Alpine F1 Team", chassis: "A525", pu: "Renault E-Tech", color: "#ec4899", drivers: ["#10 Pierre Gasly", "#7 Jack Doohan"], offset: 0.54, aero: 0.88, drs: 20.8, pu_rating: 0.89, deg_mult: 1.04, pit_sec: 2.58 },
+      { id: "sauber", name: "Stake F1 Team Kick Sauber (Audi)", chassis: "C45", pu: "Ferrari 066/14", color: "#4ade80", drivers: ["#5 Gabriel Bortoleto", "#27 Nico Hülkenberg"], offset: 0.62, aero: 0.86, drs: 20.5, pu_rating: 0.95, deg_mult: 1.06, pit_sec: 2.72 }
     ];
 
     const COMPOUNDS = {
@@ -817,6 +817,8 @@
       const team = TEAMS.find(t => t.id === document.getElementById('teamSelect').value);
       const rival = TEAMS.find(t => t.id === document.getElementById('rivalSelect').value);
       const driver = document.getElementById('driverSelect').value;
+
+      document.documentElement.style.setProperty('--team-accent', team.color);
       const [c1, c2] = document.getElementById('strategySelect').value.split('-');
       const wing = Number(document.getElementById('wingSlider').value);
       const rideMm = Number(document.getElementById('rideSlider').value);
@@ -870,7 +872,7 @@
       const gridColor = '#1c1c21';
       const tickColor = '#71717a';
 
-      // Chart 1: Lap-by-lap pace (Monochrome high-contrast)
+      // Chart 1: Lap-by-lap pace (Team Brand Color Focus)
       if (lapChartInstance) lapChartInstance.destroy();
       lapChartInstance = new Chart(document.getElementById('lapChart'), {
         type: 'line',
@@ -879,11 +881,10 @@
           datasets: [{
             label: `${driver} (${team.chassis})`,
             data: chosenSim.laps.map(x => x.pace),
-            borderColor: '#e4e4e7',
-            backgroundColor: 'rgba(228, 228, 231, 0.05)',
-            pointBackgroundColor: chosenSim.laps.map(x => x.lap === pitLap ? '#00a19b' : '#a1a1aa'),
+            borderColor: team.color,
+            pointBackgroundColor: chosenSim.laps.map(x => x.lap === pitLap ? '#f4f4f6' : team.color),
             pointRadius: chosenSim.laps.map(x => x.lap === pitLap ? 4 : 1.5),
-            borderWidth: 1.5,
+            borderWidth: 1.75,
             tension: 0.2
           }]
         },
@@ -897,7 +898,7 @@
         }
       });
 
-      // Chart 2: Pit window optimization curve (Muted structural bars + 1 focus bar)
+      // Chart 2: Pit window optimization curve (Muted structural bars + Team color focus)
       const curveDeltas = windowTotals.map(t => Number((t - bestTime).toFixed(2)));
       if (windowChartInstance) windowChartInstance.destroy();
       windowChartInstance = new Chart(document.getElementById('windowChart'), {
@@ -910,7 +911,7 @@
             backgroundColor: windowLabels.map((_, idx) => {
               const lap = idx + minPit;
               if (lap === pitLap) return '#f4f4f6';
-              if (Math.abs(lap - bestLap) <= 1) return '#71717a';
+              if (Math.abs(lap - bestLap) <= 1) return team.color;
               return '#27272a';
             }),
             borderRadius: 2
@@ -926,7 +927,7 @@
         }
       });
 
-      // Chart 3: Lap Telemetry Speed Trace (Primary White vs Muted Dashed Gray)
+      // Chart 3: Lap Telemetry Speed Trace (Team Color vs Muted Dashed Gray Rival)
       const nPts = 50;
       const distLabels = [], speedA = [], speedB = [];
       const corners = [[0.18, 0.045, 0.35], [0.42, 0.055, 0.55], [0.66, 0.040, 0.42], [0.84, 0.050, 0.62]];
@@ -953,7 +954,7 @@
         data: {
           labels: distLabels,
           datasets: [
-            { label: `${team.chassis} (Wing ${wing})`, data: speedA, borderColor: '#f4f4f6', borderWidth: 1.75, pointRadius: 0, tension: 0.3 },
+            { label: `${team.chassis} (Wing ${wing})`, data: speedA, borderColor: team.color, borderWidth: 1.85, pointRadius: 0, tension: 0.3 },
             { label: `${rival.chassis} (Wing ${circuit.opt_wing})`, data: speedB, borderColor: '#52525b', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.3 }
           ]
         },
@@ -967,7 +968,7 @@
         }
       });
 
-      // Chart 4: Rain Tire Crossover Curve (Controlled Grayscale + Single Analytical Highlight)
+      // Chart 4: Rain Tire Crossover Curve (Controlled Grayscale + Team Accent)
       const waterGrid = [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0];
       const baseDry = circuit.base_lap_sec + setup.lapDelta + 1.2;
       const slickCurve = waterGrid.map(w => Number((baseDry + 4.8 * Math.pow(w, 1.85) + (w > 0.1 ? 3.2 * w : 0)).toFixed(2)));
@@ -980,9 +981,9 @@
         data: {
           labels: waterGrid.map(w => `${w.toFixed(2)}mm`),
           datasets: [
-            { label: 'Dry Slick', data: slickCurve, borderColor: '#71717a', borderDash: [3, 3], borderWidth: 1.5, pointRadius: 2, tension: 0.25 },
-            { label: 'Intermediate (0.75mm)', data: interCurve, borderColor: '#e4e4e7', borderWidth: 2, pointRadius: 2, tension: 0.25 },
-            { label: 'Full Wet (2.50mm)', data: wetCurve, borderColor: '#00a19b', borderWidth: 1.75, pointRadius: 2, tension: 0.25 }
+            { label: 'Dry Slick', data: slickCurve, borderColor: '#52525b', borderDash: [3, 3], borderWidth: 1.5, pointRadius: 2, tension: 0.25 },
+            { label: 'Intermediate (0.75mm)', data: interCurve, borderColor: team.color, borderWidth: 2, pointRadius: 2, tension: 0.25 },
+            { label: 'Full Wet (2.50mm)', data: wetCurve, borderColor: '#e4e4e7', borderWidth: 1.5, pointRadius: 2, tension: 0.25 }
           ]
         },
         options: {
@@ -995,7 +996,7 @@
         }
       });
 
-      // Chart 5: Constructor ranking — NO RAINBOW! Highlight selected team + rival, mute others
+      // Chart 5: Constructor ranking — NO RAINBOW! Highlight selected team in its brand color, mute all others
       const teamRanking = TEAMS.map(t => {
         const s = evaluateSetup(circuit, t, circuit.opt_wing, 30, 'BALANCED');
         const lapPace = predictLap(circuit, s, Math.round(circuit.total_laps * 0.3), 'MEDIUM', 10, trackTemp);
@@ -1012,7 +1013,7 @@
             label: 'Race Pace Deficit vs. P1 (+s/lap) — Selected Constructor Highlighted',
             data: teamRanking.map(x => Number((x.pace - fastestPace + 0.02).toFixed(3))),
             backgroundColor: teamRanking.map(x => {
-              if (x.id === team.id) return '#f4f4f6';
+              if (x.id === team.id) return team.color;
               if (x.id === rival.id) return '#71717a';
               return '#27272a';
             }),
