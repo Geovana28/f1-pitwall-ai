@@ -1045,29 +1045,16 @@
       if (!q) return;
       if (q.includes('pódio') || q.includes('podio') || q.includes('chance') || q.includes('ganhar') || q.includes('ml')) {
         askAgentPreset('podium');
-      } else if (q.includes('chuva') || q.includes('rain') || q.includes('inter') || q.includes('wet') || q.includes('pneu')) {
+      } else if (q.includes('chuva') || q.includes('rain') || q.includes('inter') || q.includes('wet') || q.includes('pneu') || q.includes('água')) {
         askAgentPreset('rain');
-      } else if (q.includes('safety') || q.includes('sc') || q.includes('monte carlo') || q.includes('probabilidade')) {
+      } else if (q.includes('safety') || q.includes('sc') || q.includes('monte carlo') || q.includes('probabilidade') || q.includes('2-stop')) {
         askAgentPreset('mc');
-      } else if (q.includes('asa') || q.includes('speed') || q.includes('velocidade') || q.includes('drs') || q.includes('telemetria')) {
+      } else if (q.includes('asa') || q.includes('speed') || q.includes('velocidade') || q.includes('drs') || q.includes('telemetria') || q.includes('setup')) {
         askAgentPreset('setup');
       } else if (q.includes('box') || q.includes('pit') || q.includes('undercut') || q.includes('parada')) {
         askAgentPreset('pit');
       } else {
         askAgentPreset('guard');
-      }
-    }
-      const f1Words = ['box','pit','pneu','soft','medium','hard','inter','wet','chuva','garoa','safety','sc','undercut','asa','wing','drs','velocidade','reta','curva','volta','setup','motor','ers','f1','corrida','interlagos','mexico','monza','monaco','ferrari','mclaren','mercedes','red bull'];
-      if (!f1Words.some(w => q.includes(w))) {
-        askAgentPreset('guard');
-      } else if (q.includes('chuva') || q.includes('inter') || q.includes('wet') || q.includes('água') || q.includes('garoa')) {
-        askAgentPreset('rain');
-      } else if (q.includes('monte carlo') || q.includes('safety') || q.includes('sc') || q.includes('probabilidade') || q.includes('2-stop')) {
-        askAgentPreset('mc');
-      } else if (q.includes('asa') || q.includes('setup') || q.includes('drs') || q.includes('velocidade') || q.includes('telemetria')) {
-        askAgentPreset('setup');
-      } else {
-        askAgentPreset('pit');
       }
     }
 
