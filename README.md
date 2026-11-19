@@ -1,13 +1,38 @@
-# 🏎️ F1 Global Pit-Wall Intelligence & Strategy AI (`f1-pitwall-ai`)
+# 🏎️ F1 Global Pit-Wall Intelligence, ML & Strategy AI (`f1-pitwall-ai`)
 
 [![Live Interactive Pit-Wall](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00d2be?style=for-the-badge&logo=googlechrome&logoColor=black)](https://geovana28.github.io/f1-pitwall-ai/)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Pytest](https://img.shields.io/badge/Tests-13_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-pitwall-ai)
+[![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph%20StateGraph-orange?style=for-the-badge&logo=langchain)](https://github.com/langchain-ai/langgraph)
+[![MCP](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol%20(v1.0)-purple?style=for-the-badge)](https://modelcontextprotocol.io)
+[![Machine Learning](https://img.shields.io/badge/ML%20Model-Gradient%20Boosting%20(92.07%25%20Acc)-brightgreen?style=for-the-badge)](https://scikit-learn.org)
+[![Pytest](https://img.shields.io/badge/Tests-18_Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://github.com/Geovana28/f1-pitwall-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > **🇧🇷 Idioma**: Português (Brasil) | **🇺🇸 [English Executive Summary](#-english-executive-summary)**
 >
-> **Plataforma Global de Engenharia de Corrida, Física Veicular das 10 Equipes, Simulação Estocástica de Monte Carlo (*Safety Car* & Chuva), Telemetria de Volta e Agente Engenheiro de Box com Tool Calling para todos os 24 Circuitos do Calendário Mundial da Fórmula 1.**
+> **Plataforma Global de Engenharia de Corrida, Agente Autônomo com LangGraph StateGraph, Servidor Model Context Protocol (MCP v1.0), Modelo Preditivo de Machine Learning (Gradient Boosting 92.07%), Simulação Estocástica de Monte Carlo e Telemetria para todos os 24 Circuitos da Fórmula 1.**
+
+---
+
+### 🤖 Agente Autônomo com LangGraph & Servidor MCP (Model Context Protocol)
+
+O projeto integra um **Agente Autônomo de Pista baseado em LangGraph StateGraph cíclico** e um servidor compatível com o protocolo **Model Context Protocol (MCP v1.0)** da Anthropic (JSON-RPC 2.0):
+
+```mermaid
+flowchart TD
+    Start(["🏎️ Rádio do Cockpit (Piloto)"]) --> Router["🧭 1. Router & Intent Node<br/><i>LangGraph StateGraph</i>"]
+    Router --> Tools["⚡ 2. MCP Server Tool Execution<br/><i>Telemetria, ML & Monte Carlo</i>"]
+    Tools --> Critique{"🛡️ 3. Safety Reflection Node<br/><i>Validação Física & FIA Bounds</i>"}
+    Critique -- "⚠️ Violação Térmica / Fluxo" --> Replan["🔄 Re-planejamento Tático"]
+    Replan --> Tools
+    Critique -- "✅ Aprovado (Limites OK)" --> Broadcast["📻 4. Radio Broadcaster Node<br/><i>Síntese de rádio de box</i>"]
+    Broadcast --> End(["🏁 Transmissão ao Cockpit"])
+```
+
+#### Capacidades do Agente:
+* **LangGraph Cyclic StateGraph (`agent/graph.py`)**: Máquina de estados com nós de roteamento, execução de ferramentas MCP, autocrítica de segurança física e síntese de rádio.
+* **Servidor MCP Oficial (`mcp_server/server.py`)**: Expõe ferramentas via protocolo JSON-RPC 2.0 (`get_live_telemetry`, `predict_podium_ml`, `simulate_pit_stop_strategy`, `validate_telemetry_physics`).
+* **Inferência de Machine Learning em Tempo Real**: Conectado ao modelo de `GradientBoostingClassifier` treinado com 1.838 telemetrias reais da F1 (92.07% de acurácia e 0.949 ROC-AUC).
+* **CLI Interativo de Rádio (`demo_cli.py`)**: Terminal interativo para simulação de rádio com trace em tempo real de cada nó do grafo.
 
 ---
 
